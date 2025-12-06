@@ -49,11 +49,11 @@
             overflow-x: hidden;
         }
 
-        /* === 動態漂浮背景 === */
+        /* === 動態漂浮背景 (確保層級正確) === */
         #floating-background {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
+            z-index: -1; /* 確保在最底層 */
             pointer-events: none;
             overflow: hidden;
         }
@@ -65,6 +65,8 @@
         }
         @keyframes floatUp {
             0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.4; }
+            90% { opacity: 0.4; }
             100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
         }
 
@@ -176,13 +178,11 @@
             position: relative; overflow: hidden; cursor: pointer;
             transition: transform 0.2s, border-color 0.2s;
         }
-        /* 選中效果（用於交換） */
         .preview-item.selected {
             border: 3px solid #f59e0b;
             transform: scale(1.05);
             box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
         }
-        
         .preview-overlay {
             position: absolute; inset: 0; background: rgba(0,0,0,0.4);
             display: none; justify-content: center; align-items: center;
@@ -356,7 +356,7 @@
                 <div class="preview-row" id="preview-edit"></div>
             </div>
 
-            <!-- A. 風格 (新增大量風格) -->
+            <!-- A. 風格 (確保星空風格存在) -->
             <div style="width: 100%;">
                 <div class="section-label">背景風格</div>
                 <div class="scroll-row">
@@ -407,7 +407,6 @@
                         <input type="color" id="text-color" value="#ec4899" oninput="render()">
                     </div>
                     
-                    <!-- 修正對齊的文字描邊設定 -->
                     <div class="text-stroke-settings">
                         <div class="ts-group">
                             <label class="toggle-switch">
@@ -471,7 +470,7 @@
                 <div class="scroll-row">
                     <button class="nav-btn" onclick="scrollContainer('sticker-wrapper', -1)"><i class="fa-solid fa-chevron-left"></i></button>
                     <div class="scroll-wrapper" id="sticker-wrapper">
-                        <!-- 圖片貼圖 -->
+                        <!-- 圖片貼圖 01~10 -->
                         <img src="sticker/sticker01.png" class="sticker-img" onclick="addImageSticker('sticker/sticker01.png')" onerror="this.style.display='none'">
                         <img src="sticker/sticker02.png" class="sticker-img" onclick="addImageSticker('sticker/sticker02.png')" onerror="this.style.display='none'">
                         <img src="sticker/sticker03.png" class="sticker-img" onclick="addImageSticker('sticker/sticker03.png')" onerror="this.style.display='none'">
@@ -526,7 +525,7 @@
     <script>
         const particleColors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#2196f3', '#03a9f4', '#00bcd4', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ff9800'];
 
-        // === 漂浮背景特效 (恢復) ===
+        // === 漂浮背景特效 (修復) ===
         function initFloatingBackground() {
             const container = document.getElementById('floating-background');
             const icons = ['fa-camera', 'fa-heart', 'fa-star', 'fa-music', 'fa-bolt', 'fa-cloud', 'fa-face-smile', 'fa-ghost', 'fa-mug-hot', 'fa-paw'];
@@ -555,7 +554,8 @@
             setInterval(createIcon, 800);
             for(let i=0; i<10; i++) setTimeout(createIcon, Math.random() * 5000);
         }
-        initFloatingBackground();
+        // 確保 DOM 載入後執行
+        window.addEventListener('load', initFloatingBackground);
 
         const video = document.getElementById('video');
         const btnSnap = document.getElementById('btn-snap');
@@ -580,10 +580,12 @@
         let particles = [];
         let pCtx = particleCanvas.getContext('2d');
 
-        // === 主題庫 (新增大量風格) ===
+        // === 主題庫 (包含星空與所有新風格) ===
         const themes = {
             dots_pink: { name: '甜心粉點', bg: '#fdf2f8', primary: '#ec4899', text: '#db2777', style: 'dots', patternColor: '#fbcfe8' },
             cloud_blue: { name: '藍天白雲', bg: '#eff6ff', primary: '#3b82f6', text: '#1e40af', style: 'clouds', patternColor: '#bfdbfe' },
+            stars_black: { name: '星空黑', bg: '#0f172a', primary: '#64748b', text: '#e2e8f0', style: 'stars', patternColor: '#fbbf24' }, // RESTORED
+            
             y2k_hot: { name: 'Y2K 辣妹', bg: '#fce7f3', primary: '#db2777', text: '#be185d', style: 'y2k', patternColor: '#f472b6' },
             terrazzo_mix: { name: '繽紛水磨石', bg: '#f8fafc', primary: '#64748b', text: '#334155', style: 'terrazzo', patternColor: 'mix' },
             pop_art: { name: '波普藝術', bg: '#fef08a', primary: '#a855f7', text: '#6b21a8', style: 'popart', patternColor: '#d8b4fe' },
@@ -593,7 +595,6 @@
             cheese: { name: '起司乳酪', bg: '#ffedd5', primary: '#f59e0b', text: '#b45309', style: 'cheese', patternColor: '#fbbf24' },
             film_noise: { name: '舊電影', bg: '#1c1917', primary: '#d6d3d1', text: '#e7e5e4', style: 'film', patternColor: '#44403c' },
             
-            // 原有風格
             zigzag_mint: { name: '清新薄荷', bg: '#ecfdf5', primary: '#10b981', text: '#065f46', style: 'zigzag', patternColor: '#a7f3d0' },
             waves_blue: { name: '海浪藍', bg: '#e0f2fe', primary: '#0ea5e9', text: '#0c4a6e', style: 'waves', patternColor: '#7dd3fc' },
             cross_lavender: { name: '薰衣草紫', bg: '#f3e8ff', primary: '#a855f7', text: '#6b21a8', style: 'cross', patternColor: '#d8b4fe' },
@@ -603,7 +604,6 @@
             cow_white: { name: '哞哞乳牛', bg: '#ffffff', primary: '#334155', text: '#000000', style: 'cow', patternColor: '#1e293b' },
             argyle_navy: { name: '學院深藍', bg: '#1e293b', primary: '#3b82f6', text: '#93c5fd', style: 'argyle', patternColor: '#334155' },
             triangles_dark: { name: '幾何酷黑', bg: '#18181b', primary: '#71717a', text: '#f4f4f5', style: 'triangles', patternColor: '#3f3f46' },
-            stars_black: { name: '星空黑', bg: '#0f172a', primary: '#64748b', text: '#e2e8f0', style: 'stars', patternColor: '#fbbf24' },
             stripes_cyber: { name: '霓虹斜線', bg: '#2e1065', primary: '#d946ef', text: '#e879f9', style: 'stripes', patternColor: '#a21caf' },
             check_green: { name: '野餐綠格', bg: '#dcfce7', primary: '#22c55e', text: '#15803d', style: 'check', patternColor: '#86efac' },
             rainbow: { name: '彩虹漸層', bg: '#ffffff', primary: '#ec4899', text: '#ffffff', style: 'rainbow', patternColor: '' },
@@ -1103,6 +1103,22 @@
                     d[i+2] = Math.min(255, Math.max(0, d[i+2]+noise));
                 }
                 ctx.putImageData(id,0,0);
+            } 
+            // === 星星繪製 (RESTORED) ===
+            else if (type === 'stars') {
+                const drawStar = (cx, cy, spikes, outerRadius, innerRadius) => {
+                    let rot = Math.PI / 2 * 3; let x = cx, y = cy; let step = Math.PI / spikes;
+                    ctx.beginPath(); ctx.moveTo(cx, cy - outerRadius);
+                    for (let i = 0; i < spikes; i++) {
+                        x = cx + Math.cos(rot) * outerRadius; y = cy + Math.sin(rot) * outerRadius; ctx.lineTo(x, y); rot += step;
+                        x = cx + Math.cos(rot) * innerRadius; y = cy + Math.sin(rot) * innerRadius; ctx.lineTo(x, y); rot += step;
+                    }
+                    ctx.lineTo(cx, cy - outerRadius); ctx.closePath(); ctx.fill();
+                }
+                for(let i=0; i<(scale<1?15:80); i++) {
+                    const x = Math.random() * w; const y = Math.random() * h; const size = (Math.random() * 6 + 4) * scale;
+                    drawStar(x, y, 5, size, size/2);
+                }
             }
         }
 
