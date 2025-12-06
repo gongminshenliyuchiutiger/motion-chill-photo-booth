@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Chill Photo Booth AI</title>
+    
+    <!-- Fabric.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- MediaPipe Hands -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+    <style>
+        :root {
+            --primary: #ec4899;
+            --primary-light: #fdf2f8;
+            --text-main: #334155;
+            --text-light: #94a3b8;
+            --card-bg: #ffffff;
+            --bg-body: #f1f5f9;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px 10px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .app-shell {
+            width: 100%;
+            max-width: 480px; 
+            background: var(--card-bg);
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            font-family: 'Fredoka', sans-serif;
+            color: var(--primary);
+            margin: 0;
+            font-size: 1.8rem;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        /* 吉祥物 */
+        .mascot-container {
+            position: fixed; bottom: 20px; left: 20px; width: 100px; z-index: 99;
+        }
+        .mascot-img {
+            width: 100%; filter: drop-shadow(0 4px 5px rgba(0,0,0,0.15)); transition: 0.3s;
+        }
+        .mascot-container:hover .mascot-img {
+            transform: scale(1.1) rotate(5deg); filter: drop-shadow(0 0 10px var(--primary));
+        }
+
+        /* 拍攝視窗 */
+        .viewport-container {
+            width: 100%; aspect-ratio: 4/3; background: #000;
+            border-radius: 16px; overflow: hidden; position: relative;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 4px solid #fff;
+        }
+        video { 
+            position: absolute; top:0; left:0; width: 100%; height: 100%; 
+            object-fit: cover; transform: scaleX(-1);
+            z-index: 1;
+        }
+        #particle-canvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 10;
+        }
+        
+        #countdown-overlay {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.3);
+            display: none; justify-content: center; align-items: center;
+            color: white; font-size: 6rem; font-weight: 800; z-index: 20;
+        }
+        
+        #gesture-hint {
+            position: absolute; top: 10px; right: 10px;
+            background: rgba(0,0,0,0.6); color: white;
+            padding: 6px 12px; border-radius: 20px; font-size: 0.8rem;
+            display: none; z-index: 15; align-items: center; gap: 6px;
+        }
+        .pulse { animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+
+        /* 控制區塊 */
+        .control-group { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+
+        .mode-tabs {
+            background: #f8fafc; padding: 4px; border-radius: 50px;
+            display: flex; width: 100%; justify-content: space-between;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
+        }
+        .mode-tab {
+            flex: 1;
+            border: none; background: transparent; padding: 8px 0; border-radius: 40px;
+            font-size: 0.85rem; font-weight: bold; color: var(--text-light); cursor: pointer; transition: 0.3s;
+        }
+        .mode-tab.active { background: #fff; color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+
+        #status-display {
+            font-size: 0.95rem; font-weight: 600; color: var(--primary);
+            height: 24px; display: flex; align-items: center; gap: 8px;
+        }
+
+        .btn-main {
+            width: 100%; padding: 14px; border-radius: 16px; border: none;
+            background: var(--primary); color: white; font-size: 1.1rem; font-weight: bold;
+            cursor: pointer; box-shadow: 0 8px 20px -4px rgba(236, 72, 153, 0.4);
+            transition: transform 0.1s; display: flex; justify-content: center; align-items: center; gap: 10px;
+        }
+        .btn-main:active { transform: scale(0.98); }
+        .btn-main:disabled { background: #cbd5e1; box-shadow: none; cursor: not-allowed; }
+        .btn-secondary { background: #64748b; box-shadow: 0 8px 20px -4px rgba(100, 116, 139, 0.4); }
+
+        .preview-row {
+            display: flex; gap: 8px; justify-content: center; width: 100%; margin-top: 5px;
+        }
+        .preview-item {
+            width: 60px; height: 45px; background: #f1f5f9; border-radius: 6px;
+            border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            background-size: cover; background-position: center;
+            display: flex; justify-content: center; align-items: center; color: #cbd5e1;
+        }
+
+        /* 編輯區塊 */
+        #edit-section { display: none; width: 100%; flex-direction: column; gap: 20px; }
+
+        .scroll-row { display: flex; align-items: center; width: 100%; gap: 5px; }
+        .nav-btn {
+            background: #fff; border: 1px solid #e2e8f0; width: 32px; height: 32px;
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            cursor: pointer; color: #64748b; flex-shrink: 0; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .nav-btn:hover { background: #f1f5f9; color: var(--primary); }
+        .scroll-wrapper {
+            flex: 1; overflow-x: auto; display: flex; gap: 10px; padding: 4px 2px;
+            scrollbar-width: none; -ms-overflow-style: none; scroll-behavior: smooth;
+        }
+        .scroll-wrapper::-webkit-scrollbar { display: none; }
+        .section-label { font-size: 0.8rem; color: #94a3b8; font-weight: bold; margin-bottom: 5px; margin-left: 5px; display: flex; justify-content: space-between; align-items: center;}
+
+        /* 開關樣式 */
+        .toggle-switch {
+            display: flex; align-items: center; gap: 8px; font-size: 0.8rem; cursor: pointer; color: var(--text-main);
+        }
+        .toggle-input { display: none; }
+        .toggle-slider {
+            width: 36px; height: 20px; background: #cbd5e1; border-radius: 20px; position: relative; transition: 0.3s;
+        }
+        .toggle-slider::before {
+            content: ''; position: absolute; left: 2px; top: 2px; width: 16px; height: 16px;
+            background: white; border-radius: 50%; transition: 0.3s;
+        }
+        .toggle-input:checked + .toggle-slider { background: var(--primary); }
+        .toggle-input:checked + .toggle-slider::before { transform: translateX(16px); }
+
+        .theme-circle {
+            width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; cursor: pointer;
+            border: 3px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.1); transition: 0.2s;
+        }
+        .theme-circle.active { transform: scale(1.15); border-color: #333; }
+
+        .filter-chip {
+            padding: 6px 16px; background: #f1f5f9; border-radius: 20px;
+            font-size: 0.85rem; color: #64748b; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+            border: 1px solid transparent; transition: 0.2s;
+        }
+        .filter-chip.active { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(236, 72, 153, 0.3); }
+        
+        .sticker { font-size: 28px; cursor: pointer; padding: 0 5px; transition: 0.2s; user-select: none; }
+        .sticker:hover { transform: scale(1.2); }
+
+        /* 圖片貼圖樣式 */
+        .sticker-img {
+            height: 40px; width: auto; 
+            cursor: pointer; padding: 0 5px; transition: 0.2s; user-select: none;
+            vertical-align: middle;
+            background: #fff; border-radius: 4px; border: 1px solid #f1f5f9;
+        }
+        .sticker-img:hover { transform: scale(1.2); border-color: var(--primary); }
+
+        .toolbar-row {
+            display: flex; justify-content: center; align-items: center;
+            gap: 10px; background: #f8fafc; padding: 10px;
+            border-radius: 16px; width: 100%;
+        }
+        .icon-btn {
+            width: 36px; height: 36px; border-radius: 10px;
+            border: 1px solid #e2e8f0; background: #fff;
+            color: #64748b; display: grid; place-items: center;
+            cursor: pointer; transition: 0.2s;
+        }
+        .icon-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .text-input {
+            border: 1px solid #e2e8f0; border-radius: 8px;
+            padding: 6px 10px; width: 100px; text-align: center;
+            outline: none; font-family: inherit;
+        }
+        
+        /* 邊框設定區 */
+        .border-settings {
+            display: flex; 
+            justify-content: space-evenly; 
+            align-items: center; 
+            width: 100%;
+            background: #f8fafc; padding: 12px 10px; border-radius: 16px; margin-bottom: 5px;
+        }
+        .setting-item { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: #64748b; font-weight: bold; }
+        input[type="range"] { accent-color: var(--primary); width: 60px; cursor: pointer; }
+        input[type="color"] { width: 28px; height: 28px; border: 2px solid #e2e8f0; border-radius: 6px; background: none; cursor: pointer; padding: 0;}
+
+        #canvas-scale-container {
+            width: 100%; display: flex; justify-content: center;
+            margin: 10px 0; overflow: hidden;
+        }
+        #canvas-wrapper {
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+            border: 1px solid #e2e8f0; transform-origin: top center;
+        }
+
+        footer { margin-top: 30px; font-size: 0.8rem; color: #94a3b8; font-weight: 600; text-align: center; }
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    </style>
+</head>
+<body>
+
+    <div class="app-shell">
+        
+        <h1>Chill Photo Booth</h1>
+
+        <!-- === 1. 拍攝介面 === -->
+        <div id="camera-section" class="control-group fade-in">
+            <div class="viewport-container">
+                <video id="video" autoplay playsinline></video>
+                <canvas id="particle-canvas"></canvas>
+                <div id="countdown-overlay">3</div>
+                <div id="gesture-hint"><i class="fa-solid fa-spinner fa-spin"></i> AI模型載入中...</div>
+            </div>
+
+            <div class="mode-tabs">
+                <button class="mode-tab active" id="tab-auto" onclick="setMode('auto')">自動連拍</button>
+                <button class="mode-tab" id="tab-gesture" onclick="setMode('gesture')">✋ 感應拍</button>
+                <button class="mode-tab" id="tab-manual" onclick="setMode('manual')">手動模式</button>
+            </div>
+
+            <div id="status-display"><i class="fa-solid fa-camera-retro"></i> 準備好你的笑容！</div>
+
+            <button id="btn-snap" class="btn-main"><i class="fa-solid fa-play"></i> 開始拍攝</button>
+
+            <div class="preview-row">
+                <div class="preview-item"><i class="fa-regular fa-image"></i></div>
+                <div class="preview-item"><i class="fa-regular fa-image"></i></div>
+                <div class="preview-item"><i class="fa-regular fa-image"></i></div>
+                <div class="preview-item"><i class="fa-regular fa-image"></i></div>
+            </div>
+        </div>
+
+        <!-- === 2. 編輯介面 === -->
+        <div id="edit-section" class="fade-in">
+            
+            <!-- A. 風格 -->
+            <div style="width: 100%;">
+                <div class="section-label">風格主題</div>
+                <div class="scroll-row">
+                    <button class="nav-btn" onclick="scrollContainer('theme-wrapper', -1)"><i class="fa-solid fa-chevron-left"></i></button>
+                    <div class="scroll-wrapper" id="theme-wrapper"></div>
+                    <button class="nav-btn" onclick="scrollContainer('theme-wrapper', 1)"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+            </div>
+            
+            <!-- B. 相框設定 -->
+            <div style="width: 100%;">
+                <div class="section-label">
+                    <span>相框設定</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" class="toggle-input" id="toggle-border" onchange="render()" checked>
+                        <span class="toggle-slider"></span>
+                        顯示邊框
+                    </label>
+                </div>
+                <div class="border-settings">
+                    <div class="setting-item" title="邊框粗細">
+                        <i class="fa-solid fa-arrows-left-right-to-line"></i> 
+                        <input type="range" id="border-width" min="1" max="40" value="10" oninput="render()">
+                    </div>
+                    <div class="setting-item" title="圓角大小">
+                        <i class="fa-regular fa-square"></i> 
+                        <input type="range" id="border-radius" min="0" max="60" value="30" oninput="render()">
+                    </div>
+                    <div class="setting-item" title="邊框顏色">
+                        <i class="fa-solid fa-palette"></i> 
+                        <input type="color" id="border-color" value="#ffffff" oninput="render()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- C. 濾鏡 -->
+            <div style="width: 100%;">
+                <div class="section-label">濾鏡特效</div>
+                <div class="scroll-row">
+                    <button class="nav-btn" onclick="scrollContainer('filter-wrapper', -1)"><i class="fa-solid fa-chevron-left"></i></button>
+                    <div class="scroll-wrapper" id="filter-wrapper">
+                        <div class="filter-chip active" onclick="setFilter('none', this)">原圖</div>
+                        <div class="filter-chip" onclick="setFilter('brightness(1.05) contrast(1.05)', this)">清晰</div>
+                        <div class="filter-chip" onclick="setFilter('sepia(0.4) contrast(1.1)', this)">暖陽</div>
+                        <div class="filter-chip" onclick="setFilter('grayscale(100%) contrast(1.1)', this)">黑白</div>
+                        <div class="filter-chip" onclick="setFilter('saturate(1.4)', this)">鮮豔</div>
+                        <div class="filter-chip" onclick="setFilter('hue-rotate(-10deg) saturate(0.9)', this)">冷色</div>
+                        <div class="filter-chip" onclick="setFilter('contrast(1.25) saturate(0)', this)">電影</div>
+                        <div class="filter-chip" onclick="setFilter('opacity(0.8) brightness(1.2) sepia(0.2)', this)">褪色</div>
+                        <div class="filter-chip" onclick="setFilter('invert(0.1)', this)">底片</div>
+                    </div>
+                    <button class="nav-btn" onclick="scrollContainer('filter-wrapper', 1)"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+            </div>
+
+            <!-- D. 工具列 -->
+            <div class="toolbar-row">
+                <input type="text" id="custom-text" class="text-input" placeholder="輸入文字">
+                <div style="width:1px; height:24px; background:#e2e8f0; margin:0 5px;"></div>
+                <button class="icon-btn active" id="btn-select" onclick="setTool('select')" title="選取模式"><i class="fa-solid fa-arrow-pointer"></i></button>
+                <button class="icon-btn" id="btn-draw" onclick="setTool('draw')" title="畫筆模式"><i class="fa-solid fa-paintbrush"></i></button>
+                <input type="color" id="pen-color" value="#ec4899" onchange="updateBrush()" style="width:30px; height:30px; border:none; padding:0; background:none; cursor:pointer;">
+                <button class="icon-btn" onclick="undoLastStroke()" title="復原"><i class="fa-solid fa-rotate-left"></i></button>
+                <button class="icon-btn" onclick="deleteSelected()" title="刪除"><i class="fa-solid fa-trash-can"></i></button>
+            </div>
+
+            <!-- E. 貼圖 -->
+            <div style="width: 100%;">
+                <div class="section-label">可愛貼圖</div>
+                <div class="scroll-row">
+                    <button class="nav-btn" onclick="scrollContainer('sticker-wrapper', -1)"><i class="fa-solid fa-chevron-left"></i></button>
+                    <div class="scroll-wrapper" id="sticker-wrapper">
+                        <!-- 自定義圖片貼圖 01~05 -->
+                        <img src="sticker/sticker01.png" class="sticker-img" onclick="addImageSticker('sticker/sticker01.png')" alt="Sticker 1">
+                        <img src="sticker/sticker02.png" class="sticker-img" onclick="addImageSticker('sticker/sticker02.png')" alt="Sticker 2">
+                        <img src="sticker/sticker03.png" class="sticker-img" onclick="addImageSticker('sticker/sticker03.png')" alt="Sticker 3">
+                        <img src="sticker/sticker04.png" class="sticker-img" onclick="addImageSticker('sticker/sticker04.png')" alt="Sticker 4">
+                        <img src="sticker/sticker05.png" class="sticker-img" onclick="addImageSticker('sticker/sticker05.png')" alt="Sticker 5">
+                        
+                        <!-- 原有的文字貼圖 -->
+                        <span class="sticker" onclick="addSticker('🎀')">🎀</span>
+                        <span class="sticker" onclick="addSticker('💖')">💖</span>
+                        <span class="sticker" onclick="addSticker('✨')">✨</span>
+                        <span class="sticker" onclick="addSticker('🔥')">🔥</span>
+                        <span class="sticker" onclick="addSticker('😎')">😎</span>
+                        <span class="sticker" onclick="addSticker('🐰')">🐰</span>
+                        <span class="sticker" onclick="addSticker('👑')">👑</span>
+                        <span class="sticker" onclick="addSticker('🌸')">🌸</span>
+                        <span class="sticker" onclick="addSticker('🐱')">🐱</span>
+                        <span class="sticker" onclick="addSticker('🐶')">🐶</span>
+                        <span class="sticker" onclick="addSticker('🍓')">🍓</span>
+                        <span class="sticker" onclick="addSticker('🌈')">🌈</span>
+                        <span class="sticker" onclick="addSticker('🎂')">🎂</span>
+                        <span class="sticker" onclick="addSticker('💤')">💤</span>
+                        <span class="sticker" onclick="addSticker('💢')">💢</span>
+                    </div>
+                    <button class="nav-btn" onclick="scrollContainer('sticker-wrapper', 1)"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+            </div>
+
+            <!-- F. 畫布 -->
+            <div id="canvas-scale-container">
+                <div id="canvas-wrapper">
+                    <canvas id="c"></canvas>
+                </div>
+            </div>
+
+            <!-- G. 按鈕 -->
+            <div style="display: flex; gap: 10px; width: 100%;">
+                <button onclick="location.reload()" class="btn-main btn-secondary" style="flex: 1;"><i class="fa-solid fa-rotate-right"></i> 重拍</button>
+                <button onclick="downloadImage()" class="btn-main" style="flex: 2;"><i class="fa-solid fa-download"></i> 下載</button>
+            </div>
+
+        </div>
+
+    </div>
+
+    <footer>Copyright © Liyuchiutiger Gongminshen</footer>
+
+    <div class="mascot-container">
+        <img src="image/LiyuChillGuy.svg" alt="ChillGuy" class="mascot-img">
+    </div>
+
+    <script>
+        const video = document.getElementById('video');
+        const btnSnap = document.getElementById('btn-snap');
+        const statusDisplay = document.getElementById('status-display');
+        const countdownOverlay = document.getElementById('countdown-overlay');
+        const gestureHint = document.getElementById('gesture-hint');
+        const previewRow = document.querySelector('.preview-row');
+        const particleCanvas = document.getElementById('particle-canvas');
+        
+        let shots = [];
+        const maxShots = 4;
+        let mode = 'auto'; 
+        let isBusy = false; 
+        
+        let fabricCanvas;
+        let currentFilter = 'none';
+        
+        let hands;
+        let isModelLoaded = false;
+        let detectionLoopId = null;
+        let particles = [];
+        let pCtx = particleCanvas.getContext('2d');
+
+        const themes = {
+            pink:   { name: '甜美粉', bg: '#fdf2f8', primary: '#ec4899', secondary: '#db2777', text: '#db2777' },
+            blue:   { name: '晴空藍', bg: '#eff6ff', primary: '#3b82f6', secondary: '#1e40af', text: '#1e40af' },
+            retro:  { name: '復古紙', bg: '#fffbeb', primary: '#d97706', secondary: '#92400e', text: '#92400e' },
+            cyber:  { name: '霓虹夜', bg: '#2e1065', primary: '#d946ef', secondary: '#e879f9', text: '#e879f9' },
+            black:  { name: '太空灰', bg: '#18181b', primary: '#52525b', secondary: '#000000', text: '#d4d4d8' },
+            green:  { name: '薄荷綠', bg: '#ecfdf5', primary: '#10b981', secondary: '#059669', text: '#059669' },
+            lilac:  { name: '紫羅蘭', bg: '#f5f3ff', primary: '#8b5cf6', secondary: '#6d28d9', text: '#6d28d9' }
+        };
+        let currentTheme = 'pink';
+
+        const themeWrapper = document.getElementById('theme-wrapper');
+        Object.keys(themes).forEach(key => {
+            const t = themes[key];
+            const div = document.createElement('div');
+            div.className = 'theme-circle' + (key === 'pink' ? ' active' : '');
+            div.style.background = t.primary;
+            div.title = t.name;
+            div.onclick = (e) => setTheme(key, e.target);
+            themeWrapper.appendChild(div);
+        });
+
+        window.scrollContainer = function(id, direction) {
+            const container = document.getElementById(id);
+            container.scrollBy({ left: direction * 150, behavior: 'smooth' });
+        };
+
+        async function initCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: "user" } 
+                });
+                video.srcObject = stream;
+                await new Promise(resolve => video.onloadedmetadata = resolve);
+                video.play();
+                
+                particleCanvas.width = video.videoWidth || 640;
+                particleCanvas.height = video.videoHeight || 480;
+                animateParticles(); 
+
+                hands = new Hands({locateFile: (file) => {
+                    return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+                }});
+                hands.setOptions({
+                    maxNumHands: 2,
+                    modelComplexity: 1,
+                    minDetectionConfidence: 0.5,
+                    minTrackingConfidence: 0.5
+                });
+                hands.onResults(onHandResults);
+
+                startDetectionLoop();
+
+            } catch (err) {
+                console.error(err);
+                statusDisplay.innerHTML = `<span style="color:red"><i class="fa-solid fa-triangle-exclamation"></i> 無法開啟相機</span>`;
+            }
+        }
+        initCamera();
+
+        function createParticles() {
+            const cx = particleCanvas.width / 2;
+            const cy = particleCanvas.height / 2;
+            for(let i=0; i<40; i++) {
+                particles.push({
+                    x: cx, y: cy,
+                    vx: (Math.random() - 0.5) * 20, vy: (Math.random() - 0.5) * 20,
+                    life: 1.0, color: `rgba(14, 165, 233, ${Math.random() + 0.5})`
+                });
+            }
+        }
+        function animateParticles() {
+            pCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+            for(let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx; p.y += p.vy; p.life -= 0.02; p.vy += 0.5;
+                if(p.life <= 0) particles.splice(i, 1);
+                else {
+                    pCtx.beginPath();
+                    pCtx.arc(p.x, p.y, 4 * p.life, 0, Math.PI * 2);
+                    pCtx.fillStyle = p.color.replace(')', `, ${p.life})`); 
+                    pCtx.fill();
+                }
+            }
+            requestAnimationFrame(animateParticles);
+        }
+
+        function startDetectionLoop() {
+            async function loop() {
+                if (mode === 'gesture' && !isBusy && video.readyState >= 2) {
+                    await hands.send({image: video});
+                }
+                detectionLoopId = requestAnimationFrame(loop);
+            }
+            loop();
+        }
+
+        function onHandResults(results) {
+            if(!isModelLoaded) {
+                isModelLoaded = true;
+                if(mode === 'gesture') updateGestureHintUI(true);
+            }
+            if(isBusy) return;
+
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                const lm = results.multiHandLandmarks[0];
+                const isIndexOpen = lm[8].y < lm[6].y;
+                const isMiddleOpen = lm[12].y < lm[10].y;
+                const isRingOpen = lm[16].y < lm[14].y;
+                const isPinkyOpen = lm[20].y < lm[18].y;
+
+                if (isIndexOpen && isMiddleOpen && isRingOpen && isPinkyOpen) {
+                    if (shots.length < maxShots) triggerGestureSnap();
+                }
+            }
+        }
+
+        function updateGestureHintUI(ready) {
+            if(ready) {
+                gestureHint.innerHTML = '<i class="fa-regular fa-hand-paper pulse"></i> 比「布」自動拍';
+                gestureHint.style.background = "rgba(0,0,0,0.6)";
+            } else {
+                gestureHint.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> AI模型載入中...';
+            }
+        }
+
+        function triggerGestureSnap() {
+            isBusy = true; createParticles();
+            if(shots.length === 0) startSession();
+
+            statusDisplay.innerHTML = '<i class="fa-solid fa-hand-sparkles"></i> 偵測到手勢！';
+            gestureHint.style.background = "var(--primary)";
+            gestureHint.innerHTML = '<i class="fa-solid fa-check"></i> OK!';
+            
+            setTimeout(() => {
+                updateGestureHintUI(true);
+                takeShotWithCountdown();
+            }, 600);
+        }
+
+        window.setMode = (m) => {
+            if(isBusy) return;
+            mode = m;
+            document.querySelectorAll('.mode-tab').forEach(b => b.classList.remove('active'));
+            document.getElementById(`tab-${m}`).classList.add('active');
+            gestureHint.style.display = 'none';
+            btnSnap.disabled = false;
+            btnSnap.style.display = 'flex';
+            if(m === 'auto') {
+                btnSnap.innerHTML = '<i class="fa-solid fa-play"></i> 開始自動連拍';
+                statusDisplay.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> 自動倒數 3 秒連拍';
+            } else if (m === 'gesture') {
+                btnSnap.innerHTML = '<i class="fa-solid fa-hand"></i> 手勢模式待機中...';
+                statusDisplay.innerHTML = '請對鏡頭比「布 ✋」';
+                gestureHint.style.display = 'flex';
+                updateGestureHintUI(isModelLoaded);
+                btnSnap.disabled = true; 
+            } else {
+                btnSnap.innerHTML = '<i class="fa-solid fa-camera"></i> 立即拍照';
+                statusDisplay.innerHTML = '<i class="fa-solid fa-hand-pointer"></i> 手動控制快門';
+            }
+        };
+
+        btnSnap.onclick = () => {
+            if(isBusy) return;
+            if(shots.length === 0) startSession();
+            if(mode === 'auto') {
+                btnSnap.style.display = 'none';
+                runAutoSequence(1);
+            } else if (mode === 'manual') takeManualShot();
+        };
+
+        function startSession() {
+            shots = [];
+            Array.from(previewRow.children).forEach(div => {
+                div.style.backgroundImage = ''; div.innerHTML = '<i class="fa-regular fa-image"></i>';
+            });
+        }
+
+        function runAutoSequence(i) {
+            if(i > maxShots) { finish(); return; }
+            statusDisplay.innerText = `準備拍攝第 ${i} 張...`;
+            isBusy = true;
+            setTimeout(() => {
+                runCountdown(3, () => {
+                    snap(i);
+                    isBusy = false;
+                    if(i < maxShots) {
+                        statusDisplay.innerText = "稍等一下...";
+                        setTimeout(() => runAutoSequence(i+1), 1500);
+                    } else {
+                        setTimeout(finish, 800);
+                    }
+                });
+            }, 1000);
+        }
+
+        function takeManualShot() {
+            isBusy = true;
+            const i = shots.length + 1;
+            snap(i);
+            setTimeout(() => { isBusy = false; }, 500);
+            
+            if(shots.length === maxShots) setTimeout(finish, 800);
+            else {
+                btnSnap.innerHTML = `<i class="fa-solid fa-camera"></i> 拍下一張 (${i}/4)`;
+                statusDisplay.innerText = `已拍攝 ${i} 張，請繼續`;
+            }
+        }
+
+        function takeShotWithCountdown() {
+            const i = shots.length + 1;
+            runCountdown(3, () => {
+                snap(i);
+                setTimeout(() => { 
+                    if(shots.length < maxShots) {
+                        statusDisplay.innerHTML = `已拍 ${i}/4，請比「布 ✋」拍下一張`; 
+                        isBusy = false; 
+                    } else finish();
+                }, 2500);
+            });
+        }
+
+        function runCountdown(sec, callback) {
+            countdownOverlay.style.display = 'flex';
+            countdownOverlay.innerText = sec;
+            let timer = setInterval(() => {
+                sec--;
+                if(sec>0) countdownOverlay.innerText = sec;
+                else {
+                    clearInterval(timer);
+                    countdownOverlay.style.display = 'none';
+                    callback();
+                }
+            }, 1000);
+        }
+
+        function snap(i) {
+            const f = document.createElement('div');
+            f.style.position='fixed'; f.style.inset=0; f.style.background='white'; f.style.zIndex=999;
+            document.body.appendChild(f);
+            f.animate([{opacity:1}, {opacity:0}], {duration:200}).onfinish = () => f.remove();
+
+            const c = document.createElement('canvas');
+            const targetW = 800; const targetH = 600; 
+            c.width = targetW; c.height = targetH;
+            const ctx = c.getContext('2d');
+            
+            ctx.translate(c.width, 0); ctx.scale(-1, 1);
+            const vw = video.videoWidth; const vh = video.videoHeight;
+            const targetRatio = targetW / targetH; const videoRatio = vw / vh;
+            let sx, sy, sw, sh;
+            if (videoRatio > targetRatio) {
+                sh = vh; sw = sh * targetRatio; sy = 0; sx = (vw - sw) / 2;
+            } else {
+                sw = vw; sh = sw / targetRatio; sx = 0; sy = (vh - sh) / 2;
+            }
+            ctx.drawImage(video, sx, sy, sw, sh, 0, 0, targetW, targetH);
+            
+            const data = c.toDataURL('image/png');
+            shots.push(data);
+            const div = previewRow.children[i-1];
+            div.style.backgroundImage = `url(${data})`;
+            div.innerHTML = '';
+        }
+
+        function finish() {
+            isBusy = true;
+            statusDisplay.innerHTML = `<i class="fa-solid fa-check"></i> 完成！生成中...`;
+            if(detectionLoopId) cancelAnimationFrame(detectionLoopId);
+            setTimeout(() => {
+                document.getElementById('camera-section').classList.add('hidden');
+                document.getElementById('edit-section').style.display = 'flex';
+                initEditor();
+            }, 800);
+        }
+
+        function initEditor() {
+            fabricCanvas = new fabric.Canvas('c', { isDrawingMode: false });
+            render();
+            window.addEventListener('resize', fitCanvas);
+            document.getElementById('custom-text').addEventListener('input', render);
+            
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Delete' || e.key === 'Backspace') {
+                    deleteSelected();
+                }
+            });
+            
+            setTool('select');
+        }
+
+        window.setTheme = (k, el) => {
+            currentTheme = k;
+            const t = themes[k];
+            document.querySelectorAll('.theme-circle').forEach(d => d.classList.remove('active'));
+            if(el) el.classList.add('active');
+            document.documentElement.style.setProperty('--primary', t.primary);
+            render();
+        };
+
+        window.setFilter = (f, el) => {
+            currentFilter = f;
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            render();
+        };
+
+        function roundRect(ctx, x, y, w, h, r) {
+            if (w < 2 * r) r = w / 2;
+            if (h < 2 * r) r = h / 2;
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.arcTo(x + w, y, x + w, y + h, r);
+            ctx.arcTo(x + w, y + h, x, y + h, r);
+            ctx.arcTo(x, y + h, x, y, r);
+            ctx.arcTo(x, y, x + w, y, r);
+            ctx.closePath();
+            return ctx;
+        }
+
+        function render() {
+            const t = themes[currentTheme];
+            const pW = 400; const pH = 300; const pad = 30; const foot = 120;
+            const tW = (pW * 2) + (pad * 3);
+            const tH = (pH * 2) + (pad * 3) + foot;
+            window.orgW = tW; window.orgH = tH;
+
+            const bgC = document.createElement('canvas');
+            bgC.width = tW; bgC.height = tH;
+            const ctx = bgC.getContext('2d');
+
+            ctx.fillStyle = t.bg;
+            ctx.fillRect(0, 0, tW, tH);
+            
+            // 邊框設定
+            const showBorder = document.getElementById('toggle-border').checked;
+            const borderWidth = parseInt(document.getElementById('border-width').value);
+            const borderColor = document.getElementById('border-color').value;
+            // 圓角設定
+            const radius = parseInt(document.getElementById('border-radius').value);
+
+            let loaded = 0;
+            shots.forEach((src, i) => {
+                const img = new Image();
+                img.onload = () => {
+                    const col = i % 2; const row = Math.floor(i / 2);
+                    const x = pad + (col * (pW + pad));
+                    const y = pad + (row * (pH + pad));
+
+                    ctx.save();
+                    roundRect(ctx, x, y, pW, pH, radius);
+                    ctx.clip();
+                    if(currentFilter !== 'none') ctx.filter = currentFilter;
+                    ctx.drawImage(img, x, y, pW, pH);
+                    ctx.restore();
+
+                    if (showBorder && borderWidth > 0) {
+                        ctx.save();
+                        ctx.lineWidth = borderWidth;
+                        ctx.strokeStyle = borderColor;
+                        roundRect(ctx, x, y, pW, pH, radius);
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+
+                    loaded++;
+                    if(loaded === 4) {
+                        ctx.fillStyle = t.text;
+                        ctx.textAlign = 'center';
+                        ctx.font = "bold 32px 'Noto Sans TC', sans-serif";
+                        
+                        const now = new Date();
+                        const yyyy = now.getFullYear();
+                        const mm = String(now.getMonth() + 1).padStart(2, '0');
+                        const dd = String(now.getDate()).padStart(2, '0');
+                        const dateStr = `${yyyy}.${mm}.${dd}`;
+
+                        const input = document.getElementById('custom-text').value.trim();
+                        let txt = "Chill Photo Booth";
+                        if(input) txt += ` ｜ ${input}`;
+                        txt += ` ｜ ${dateStr}`;
+                        
+                        ctx.fillText(txt, tW/2, tH-50);
+
+                        if (fabricCanvas) {
+                            fabricCanvas.setDimensions({ width: tW, height: tH });
+                            fabric.Image.fromURL(bgC.toDataURL(), (imgObj) => {
+                                fabricCanvas.setBackgroundImage(imgObj, fabricCanvas.renderAll.bind(fabricCanvas));
+                                fitCanvas();
+                            });
+                        }
+                    }
+                };
+                img.src = src;
+            });
+        }
+
+        function fitCanvas() {
+            if(!window.orgW) return;
+            const container = document.querySelector('.app-shell');
+            const availableW = container.clientWidth - 40; 
+            const wrap = document.getElementById('canvas-wrapper');
+            const outer = document.getElementById('canvas-scale-container');
+            const scale = Math.min(availableW / window.orgW, 1);
+            wrap.style.transform = `scale(${scale})`;
+            wrap.style.width = `${window.orgW}px`;
+            wrap.style.height = `${window.orgH}px`;
+            outer.style.width = `100%`;
+            outer.style.height = `${window.orgH * scale}px`;
+        }
+
+        window.setTool = (toolName) => {
+            const btnSelect = document.getElementById('btn-select');
+            const btnDraw = document.getElementById('btn-draw');
+            
+            if (toolName === 'select') {
+                fabricCanvas.isDrawingMode = false;
+                btnSelect.classList.add('active');
+                btnDraw.classList.remove('active');
+            } else if (toolName === 'draw') {
+                fabricCanvas.isDrawingMode = true;
+                btnSelect.classList.remove('active');
+                btnDraw.classList.add('active');
+                const b = new fabric.PencilBrush(fabricCanvas);
+                b.color = document.getElementById('pen-color').value;
+                b.width = 12;
+                fabricCanvas.freeDrawingBrush = b;
+            }
+        };
+
+        // 處理圖片貼圖：使用標準 Image 物件載入，避開 CORS 問題
+        window.addImageSticker = (url) => {
+            setTool('select');
+            const imgObj = new Image();
+            imgObj.src = url;
+            imgObj.onload = function() {
+                const imgInstance = new fabric.Image(imgObj);
+                imgInstance.scaleToWidth(150);
+                imgInstance.set({
+                    left: fabricCanvas.width / 2,
+                    top: fabricCanvas.height / 2,
+                    originX: 'center',
+                    originY: 'center'
+                });
+                fabricCanvas.add(imgInstance);
+                fabricCanvas.setActiveObject(imgInstance);
+                fabricCanvas.renderAll();
+            }
+        };
+
+        window.addSticker = (s) => {
+            setTool('select');
+            const txt = new fabric.Text(s, { 
+                left: fabricCanvas.width/2, top: fabricCanvas.height/2, 
+                originX:'center', originY:'center', fontSize:100 
+            });
+            fabricCanvas.add(txt); fabricCanvas.setActiveObject(txt);
+        };
+        
+        window.updateBrush = () => { if(fabricCanvas.freeDrawingBrush) fabricCanvas.freeDrawingBrush.color = document.getElementById('pen-color').value; };
+        window.undoLastStroke = () => {
+            const objs = fabricCanvas.getObjects();
+            for(let i=objs.length-1; i>=0; i--) { if(objs[i].type === 'path') { fabricCanvas.remove(objs[i]); break; } }
+        };
+        window.deleteSelected = () => { const o = fabricCanvas.getActiveObject(); if(o) fabricCanvas.remove(o); };
+        
+        // 下載功能：改用 Blob 以支援較大檔案與錯誤偵測
+        window.downloadImage = () => {
+            try {
+                fabricCanvas.discardActiveObject(); 
+                fabricCanvas.renderAll();
+                
+                const dataURL = fabricCanvas.toDataURL({format:'png', multiplier:1});
+                
+                const base64ToBlob = (base64) => {
+                    const arr = base64.split(',');
+                    const mime = arr[0].match(/:(.*?);/)[1];
+                    const bstr = atob(arr[1]);
+                    let n = bstr.length;
+                    const u8arr = new Uint8Array(n);
+                    while(n--) { u8arr[n] = bstr.charCodeAt(n); }
+                    return new Blob([u8arr], {type:mime});
+                };
+
+                const blob = base64ToBlob(dataURL);
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Chill_${Date.now()}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } catch (e) {
+                console.error(e);
+                alert("下載失敗！可能是圖片權限問題 (CORS)。請嘗試在伺服器環境下執行。");
+            }
+        };
+
+        setMode('auto');
+    </script>
+</body>
+</html>
