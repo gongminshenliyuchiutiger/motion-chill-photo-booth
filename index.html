@@ -49,18 +49,12 @@
             overflow-x: hidden;
         }
 
-        /* === 動態漂浮背景 (確保層級正確) === */
         #floating-background {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1; /* 確保在最底層 */
-            pointer-events: none;
-            overflow: hidden;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; pointer-events: none; overflow: hidden;
         }
         .floating-icon {
-            position: absolute;
-            bottom: -50px;
-            opacity: 0.3;
+            position: absolute; bottom: -50px; opacity: 0.3;
             animation: floatUp linear forwards;
         }
         @keyframes floatUp {
@@ -71,41 +65,32 @@
         }
 
         .app-shell {
-            width: 100%;
-            max-width: 480px; 
-            background: var(--card-bg);
-            border-radius: 24px;
+            width: 100%; max-width: 480px; 
+            background: var(--card-bg); border-radius: 24px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.08);
             padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-            position: relative;
-            z-index: 10;
+            display: flex; flex-direction: column; align-items: center; gap: 20px;
+            position: relative; z-index: 10;
         }
 
         h1 {
-            font-family: 'Fredoka', sans-serif;
-            color: var(--primary);
-            margin: 0;
-            font-size: 1.8rem;
-            letter-spacing: 1px;
-            text-align: center;
+            font-family: 'Fredoka', sans-serif; color: var(--primary);
+            margin: 0; font-size: 1.8rem; letter-spacing: 1px; text-align: center;
         }
 
-        /* 吉祥物 */
         .mascot-container {
-            position: fixed; bottom: 20px; left: 20px; width: 100px; z-index: 99;
+            position: fixed; bottom: 20px; left: 20px; width: 100px; 
+            z-index: 999; cursor: grab; touch-action: none; user-select: none;
         }
+        .mascot-container:active { cursor: grabbing; }
         .mascot-img {
-            width: 100%; filter: drop-shadow(0 4px 5px rgba(0,0,0,0.15)); transition: 0.3s;
+            width: 100%; filter: drop-shadow(0 4px 5px rgba(0,0,0,0.15)); 
+            transition: transform 0.3s; pointer-events: none;
         }
         .mascot-container:hover .mascot-img {
             transform: scale(1.1) rotate(5deg); filter: drop-shadow(0 0 10px var(--primary));
         }
 
-        /* 拍攝視窗 */
         .viewport-container {
             width: 100%; aspect-ratio: 4/3; background: #000;
             border-radius: 16px; overflow: hidden; position: relative;
@@ -113,8 +98,7 @@
         }
         video { 
             position: absolute; top:0; left:0; width: 100%; height: 100%; 
-            object-fit: cover; transform: scaleX(-1);
-            z-index: 1;
+            object-fit: cover; transform: scaleX(-1); z-index: 1;
         }
         #particle-canvas {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -136,7 +120,6 @@
         .pulse { animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
 
-        /* 控制區塊 */
         .control-group { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 15px; }
 
         .mode-tabs {
@@ -145,8 +128,7 @@
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
         }
         .mode-tab {
-            flex: 1;
-            border: none; background: transparent; padding: 8px 0; border-radius: 40px;
+            flex: 1; border: none; background: transparent; padding: 8px 0; border-radius: 40px;
             font-size: 0.85rem; font-weight: bold; color: var(--text-light); cursor: pointer; transition: 0.3s;
         }
         .mode-tab.active { background: #fff; color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
@@ -166,10 +148,7 @@
         .btn-main:disabled { background: #cbd5e1; box-shadow: none; cursor: not-allowed; }
         .btn-secondary { background: #64748b; box-shadow: 0 8px 20px -4px rgba(100, 116, 139, 0.4); }
 
-        /* 預覽與重拍上傳區塊 */
-        .preview-row {
-            display: flex; gap: 8px; justify-content: center; width: 100%; margin-top: 5px;
-        }
+        .preview-row { display: flex; gap: 8px; justify-content: center; width: 100%; margin-top: 5px; }
         .preview-item {
             width: 70px; height: 52px; background: #f1f5f9; border-radius: 8px;
             border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
@@ -178,11 +157,7 @@
             position: relative; overflow: hidden; cursor: pointer;
             transition: transform 0.2s, border-color 0.2s;
         }
-        .preview-item.selected {
-            border: 3px solid #f59e0b;
-            transform: scale(1.05);
-            box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
-        }
+        .preview-item.selected { border: 3px solid #f59e0b; transform: scale(1.05); box-shadow: 0 0 10px rgba(245, 158, 11, 0.5); }
         .preview-overlay {
             position: absolute; inset: 0; background: rgba(0,0,0,0.4);
             display: none; justify-content: center; align-items: center;
@@ -196,9 +171,7 @@
         }
         .mini-btn:hover { background: var(--primary); }
 
-        /* 編輯區塊 */
         #edit-section { display: none; width: 100%; flex-direction: column; gap: 20px; }
-
         .scroll-row { display: flex; align-items: center; width: 100%; gap: 5px; }
         .nav-btn {
             background: #fff; border: 1px solid #e2e8f0; width: 32px; height: 32px;
@@ -213,22 +186,12 @@
         .scroll-wrapper::-webkit-scrollbar { display: none; }
         .section-label { font-size: 0.8rem; color: #94a3b8; font-weight: bold; margin-bottom: 5px; margin-left: 5px; display: flex; justify-content: space-between; align-items: center;}
 
-        /* 開關樣式 */
-        .toggle-switch {
-            display: flex; align-items: center; gap: 8px; font-size: 0.8rem; 
-            cursor: pointer; color: var(--text-main); font-weight: bold;
-            line-height: 1;
-        }
+        .toggle-switch { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; cursor: pointer; color: var(--text-main); font-weight: bold; line-height: 1; }
         .toggle-input { display: none; }
-        .toggle-slider {
-            width: 44px; height: 24px; 
-            background: #cbd5e1; border-radius: 24px; position: relative; transition: 0.3s;
-            flex-shrink: 0;
-        }
+        .toggle-slider { width: 44px; height: 24px; background: #cbd5e1; border-radius: 24px; position: relative; transition: 0.3s; flex-shrink: 0; }
         .toggle-slider::before {
             content: ''; position: absolute; left: 3px; top: 3px; width: 18px; height: 18px;
-            background: white; border-radius: 50%; transition: 0.3s;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            background: white; border-radius: 50%; transition: 0.3s; box-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
         .toggle-input:checked + .toggle-slider { background: var(--primary); }
         .toggle-input:checked + .toggle-slider::before { transform: translateX(20px); }
@@ -255,77 +218,44 @@
         }
         .sticker-img:hover { transform: scale(1.2); border-color: var(--primary); }
 
-        .toolbar-column {
-            display: flex; flex-direction: column; gap: 10px; width: 100%;
-            background: #f8fafc; padding: 12px; border-radius: 16px;
-        }
-        .toolbar-row {
-            display: flex; justify-content: center; align-items: center; gap: 8px; width: 100%; flex-wrap: wrap;
-        }
+        .toolbar-column { display: flex; flex-direction: column; gap: 10px; width: 100%; background: #f8fafc; padding: 12px; border-radius: 16px; }
+        .toolbar-row { display: flex; justify-content: center; align-items: center; gap: 8px; width: 100%; flex-wrap: wrap; }
         .icon-btn {
             width: 36px; height: 36px; border-radius: 10px; border: 1px solid #e2e8f0; background: #fff;
             color: #64748b; display: grid; place-items: center; cursor: pointer; transition: 0.2s; flex-shrink: 0;
         }
         .icon-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
         
-        .text-input {
-            border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 10px; flex: 1; min-width: 120px;
-            outline: none; font-family: inherit; font-size: 0.9rem;
-        }
-        .select-input {
-            border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px; font-size: 0.85rem; outline: none; background: #fff; cursor: pointer; color: #334155; flex: 1;
-        }
+        .text-input { border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 10px; flex: 1; min-width: 120px; outline: none; font-family: inherit; font-size: 0.9rem; }
+        .select-input { border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px; font-size: 0.85rem; outline: none; background: #fff; cursor: pointer; color: #334155; flex: 1; }
         
-        .border-settings {
-            display: flex; justify-content: space-evenly; align-items: center; width: 100%;
-            background: #f8fafc; padding: 12px 10px; border-radius: 16px; margin-bottom: 5px;
-        }
+        .border-settings { display: flex; justify-content: space-evenly; align-items: center; width: 100%; background: #f8fafc; padding: 12px 10px; border-radius: 16px; margin-bottom: 5px; }
 
-        /* 修正文字描邊設定的對齊 */
-        .text-stroke-settings { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            width: 100%;
-            margin-top: 5px; 
-            padding: 8px 5px; 
-            border-top: 1px solid #e2e8f0; 
-            background: transparent; 
-            height: 48px;
-        }
+        .text-stroke-settings { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 5px; padding: 8px 5px; border-top: 1px solid #e2e8f0; background: transparent; height: 48px; }
         .ts-group { display: flex; align-items: center; gap: 10px; }
 
         .setting-item { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: #64748b; font-weight: bold; }
         input[type="range"] { accent-color: var(--primary); width: 60px; cursor: pointer; vertical-align: middle; }
         input[type="color"] { width: 30px; height: 30px; border: 2px solid #e2e8f0; border-radius: 6px; background: none; cursor: pointer; padding: 0; overflow: hidden; vertical-align: middle;}
         
-        #canvas-scale-container {
-            width: 100%; display: flex; justify-content: center; margin: 10px 0; overflow: hidden;
-        }
-        #canvas-wrapper {
-            box-shadow: 0 10px 30px rgba(0,0,0,0.12); border: 1px solid #e2e8f0; transform-origin: top center;
-        }
+        #canvas-scale-container { width: 100%; display: flex; justify-content: center; margin: 10px 0; overflow: hidden; }
+        #canvas-wrapper { box-shadow: 0 10px 30px rgba(0,0,0,0.12); border: 1px solid #e2e8f0; transform-origin: top center; }
 
         footer { margin-top: 30px; font-size: 0.8rem; color: #94a3b8; font-weight: 600; text-align: center; }
         .hidden { display: none !important; }
         .fade-in { animation: fadeIn 0.5s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
     </style>
 </head>
 <body>
 
-    <!-- 隱藏的圖片上傳 Input -->
     <input type="file" id="img-upload" hidden accept="image/*">
-
-    <!-- 背景動態漂浮層 -->
     <div id="floating-background"></div>
 
     <div class="app-shell">
-        
-        <h1>Chill Photo Booth</h1>
+        <h1>Chill Photo Booth System</h1>
 
-        <!-- === 1. 拍攝介面 === -->
+        <!-- 1. 拍攝介面 -->
         <div id="camera-section" class="control-group fade-in">
             <div class="viewport-container">
                 <video id="video" autoplay playsinline></video>
@@ -343,20 +273,17 @@
             <div id="status-display"><i class="fa-solid fa-camera-retro"></i> 準備好你的笑容！</div>
 
             <button id="btn-snap" class="btn-main"><i class="fa-solid fa-play"></i> 開始拍攝</button>
-
-            <!-- 預覽圖 -->
             <div class="preview-row" id="preview-camera"></div>
         </div>
 
-        <!-- === 2. 編輯介面 === -->
+        <!-- 2. 編輯介面 -->
         <div id="edit-section" class="fade-in">
-            
             <div style="width: 100%;">
                 <div class="section-label">調整照片 (點擊選取可交換位置)</div>
                 <div class="preview-row" id="preview-edit"></div>
             </div>
 
-            <!-- A. 風格 (確保星空風格存在) -->
+            <!-- 風格 (含自訂圖片) -->
             <div style="width: 100%;">
                 <div class="section-label">背景風格</div>
                 <div class="scroll-row">
@@ -366,33 +293,23 @@
                 </div>
             </div>
             
-            <!-- B. 相框設定 -->
+            <!-- 相框 -->
             <div style="width: 100%;">
                 <div class="section-label">
                     <span>相框設定</span>
                     <label class="toggle-switch">
                         <input type="checkbox" class="toggle-input" id="toggle-border" onchange="render()" checked>
-                        <span class="toggle-slider"></span>
-                        顯示邊框
+                        <span class="toggle-slider"></span> 顯示邊框
                     </label>
                 </div>
                 <div class="border-settings">
-                    <div class="setting-item">
-                        <i class="fa-solid fa-arrows-left-right-to-line"></i> 
-                        <input type="range" id="border-width" min="1" max="40" value="15" oninput="render()">
-                    </div>
-                    <div class="setting-item">
-                        <i class="fa-regular fa-square"></i> 
-                        <input type="range" id="border-radius" min="0" max="60" value="0" oninput="render()">
-                    </div>
-                    <div class="setting-item">
-                        <i class="fa-solid fa-palette"></i> 
-                        <input type="color" id="border-color" value="#ffffff" oninput="render()">
-                    </div>
+                    <div class="setting-item"><i class="fa-solid fa-arrows-left-right-to-line"></i> <input type="range" id="border-width" min="1" max="40" value="15" oninput="render()"></div>
+                    <div class="setting-item"><i class="fa-regular fa-square"></i> <input type="range" id="border-radius" min="0" max="60" value="0" oninput="render()"></div>
+                    <div class="setting-item"><i class="fa-solid fa-palette"></i> <input type="color" id="border-color" value="#ffffff" oninput="render()"></div>
                 </div>
             </div>
 
-            <!-- C. 文字與工具 -->
+            <!-- 文字工具 -->
             <div style="width: 100%;">
                 <div class="section-label">文字與工具</div>
                 <div class="toolbar-column">
@@ -406,26 +323,18 @@
                         </select>
                         <input type="color" id="text-color" value="#ec4899" oninput="render()">
                     </div>
-                    
                     <div class="text-stroke-settings">
                         <div class="ts-group">
                             <label class="toggle-switch">
                                 <input type="checkbox" class="toggle-input" id="text-stroke-toggle" onchange="render()" checked>
-                                <span class="toggle-slider"></span>
-                                文字描邊
+                                <span class="toggle-slider"></span> 文字描邊
                             </label>
                         </div>
                         <div class="ts-group">
-                            <div class="setting-item">
-                                <i class="fa-solid fa-pen-nib"></i>
-                                <input type="range" id="text-stroke-width" min="1" max="15" value="5" oninput="render()" style="width: 60px;">
-                            </div>
-                            <div class="setting-item">
-                                <input type="color" id="text-stroke-color" value="#ffffff" oninput="render()" style="width: 28px; height: 28px;">
-                            </div>
+                            <div class="setting-item"><i class="fa-solid fa-pen-nib"></i> <input type="range" id="text-stroke-width" min="1" max="15" value="5" oninput="render()" style="width: 60px;"></div>
+                            <div class="setting-item"><input type="color" id="text-stroke-color" value="#ffffff" oninput="render()" style="width: 28px; height: 28px;"></div>
                         </div>
                     </div>
-
                     <div style="width:100%; height:1px; background:#e2e8f0; margin-top: 5px;"></div>
                     <div class="toolbar-row">
                         <button class="icon-btn active" id="btn-select" onclick="setTool('select')"><i class="fa-solid fa-arrow-pointer"></i></button>
@@ -437,7 +346,7 @@
                 </div>
             </div>
 
-            <!-- D. 濾鏡 -->
+            <!-- 濾鏡 -->
             <div style="width: 100%;">
                 <div class="section-label">濾鏡特效</div>
                 <div class="scroll-row">
@@ -464,13 +373,12 @@
                 </div>
             </div>
 
-            <!-- E. 貼圖 -->
+            <!-- 貼圖 -->
             <div style="width: 100%;">
                 <div class="section-label">可愛貼圖</div>
                 <div class="scroll-row">
                     <button class="nav-btn" onclick="scrollContainer('sticker-wrapper', -1)"><i class="fa-solid fa-chevron-left"></i></button>
                     <div class="scroll-wrapper" id="sticker-wrapper">
-                        <!-- 圖片貼圖 01~10 -->
                         <img src="sticker/sticker01.png" class="sticker-img" onclick="addImageSticker('sticker/sticker01.png')" onerror="this.style.display='none'">
                         <img src="sticker/sticker02.png" class="sticker-img" onclick="addImageSticker('sticker/sticker02.png')" onerror="this.style.display='none'">
                         <img src="sticker/sticker03.png" class="sticker-img" onclick="addImageSticker('sticker/sticker03.png')" onerror="this.style.display='none'">
@@ -481,8 +389,6 @@
                         <img src="sticker/sticker08.png" class="sticker-img" onclick="addImageSticker('sticker/sticker08.png')" onerror="this.style.display='none'">
                         <img src="sticker/sticker09.png" class="sticker-img" onclick="addImageSticker('sticker/sticker09.png')" onerror="this.style.display='none'">
                         <img src="sticker/sticker10.png" class="sticker-img" onclick="addImageSticker('sticker/sticker10.png')" onerror="this.style.display='none'">
-                        
-                         <!-- Emoji 貼圖 -->
                          <span class="sticker" onclick="addSticker('🎀')">🎀</span>
                          <span class="sticker" onclick="addSticker('💖')">💖</span>
                          <span class="sticker" onclick="addSticker('✨')">✨</span>
@@ -501,60 +407,45 @@
                 </div>
             </div>
 
-            <!-- F. 畫布 -->
+            <!-- 畫布 -->
             <div id="canvas-scale-container">
-                <div id="canvas-wrapper">
-                    <canvas id="c"></canvas>
-                </div>
+                <div id="canvas-wrapper"><canvas id="c"></canvas></div>
             </div>
 
-            <!-- G. 按鈕 -->
+            <!-- 按鈕 -->
             <div style="display: flex; gap: 10px; width: 100%;">
-                <button onclick="fullReset()" class="btn-main btn-secondary" style="flex: 1;"><i class="fa-solid fa-rotate-right"></i> 全部重來</button>
+                <button onclick="fullReset()" class="btn-main btn-secondary" style="flex: 1;"><i class="fa-solid fa-rotate-right"></i> 重拍</button>
                 <button onclick="downloadImage()" class="btn-main" style="flex: 2;"><i class="fa-solid fa-download"></i> 下載</button>
             </div>
         </div>
     </div>
 
     <footer>Copyright © Liyuchiutiger Gongminshen</footer>
-
     <div class="mascot-container">
         <img src="image/LiyuChillGuy.svg" alt="ChillGuy" class="mascot-img" onerror="this.style.display='none'">
     </div>
 
     <script>
         const particleColors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#2196f3', '#03a9f4', '#00bcd4', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ff9800'];
-
-        // === 漂浮背景特效 (修復) ===
+        
         function initFloatingBackground() {
             const container = document.getElementById('floating-background');
             const icons = ['fa-camera', 'fa-heart', 'fa-star', 'fa-music', 'fa-bolt', 'fa-cloud', 'fa-face-smile', 'fa-ghost', 'fa-mug-hot', 'fa-paw'];
-            
             function createIcon() {
                 const icon = document.createElement('i');
                 const randomIcon = icons[Math.floor(Math.random() * icons.length)];
                 const randomColor = particleColors[Math.floor(Math.random() * particleColors.length)];
-                
                 icon.className = `fa-solid ${randomIcon} floating-icon`;
-                
                 const size = Math.random() * 20 + 15;
                 const left = Math.random() * 100;
                 const duration = Math.random() * 10 + 10;
-                
-                icon.style.fontSize = `${size}px`;
-                icon.style.left = `${left}%`;
-                icon.style.color = randomColor;
-                icon.style.animationDuration = `${duration}s`;
-
+                icon.style.fontSize = `${size}px`; icon.style.left = `${left}%`; icon.style.color = randomColor; icon.style.animationDuration = `${duration}s`;
                 container.appendChild(icon);
-
                 setTimeout(() => { icon.remove(); }, duration * 1000);
             }
-
             setInterval(createIcon, 800);
             for(let i=0; i<10; i++) setTimeout(createIcon, Math.random() * 5000);
         }
-        // 確保 DOM 載入後執行
         window.addEventListener('load', initFloatingBackground);
 
         const video = document.getElementById('video');
@@ -570,7 +461,7 @@
         let mode = 'auto'; 
         let isBusy = false;
         let isEditing = false; 
-        let swapSourceIndex = -1; // 用於交換順序
+        let swapSourceIndex = -1;
         
         let fabricCanvas;
         let currentFilter = 'none';
@@ -580,12 +471,17 @@
         let particles = [];
         let pCtx = particleCanvas.getContext('2d');
 
-        // === 主題庫 (包含星空與所有新風格) ===
+        // === 主題庫 (包含自訂圖片與內建風格) ===
         const themes = {
+            custom_01: { name: '自訂風格 1', bg: '#ffffff', primary: '#ec4899', text: '#333333', style: 'image', src: 'bg-frame/bg-frame-01.png' },
+            custom_02: { name: '自訂風格 2', bg: '#ffffff', primary: '#ec4899', text: '#333333', style: 'image', src: 'bg-frame/bg-frame-02.png' },
+custom_03: { name: '自訂風格 3', bg: '#ffffff', primary: '#ec4899', text: '#333333', style: 'image', src: 'bg-frame/bg-frame-03.png' },
+custom_04: { name: '自訂風格 4', bg: '#ffffff', primary: '#ec4899', text: '#333333', style: 'image', src: 'bg-frame/bg-frame-04.png' },
+custom_05: { name: '自訂風格 5', bg: '#ffffff', primary: '#ec4899', text: '#333333', style: 'image', src: 'bg-frame/bg-frame-05.png' },
+            
             dots_pink: { name: '甜心粉點', bg: '#fdf2f8', primary: '#ec4899', text: '#db2777', style: 'dots', patternColor: '#fbcfe8' },
             cloud_blue: { name: '藍天白雲', bg: '#eff6ff', primary: '#3b82f6', text: '#1e40af', style: 'clouds', patternColor: '#bfdbfe' },
-            stars_black: { name: '星空黑', bg: '#0f172a', primary: '#64748b', text: '#e2e8f0', style: 'stars', patternColor: '#fbbf24' }, // RESTORED
-            
+            stars_black: { name: '星空黑', bg: '#0f172a', primary: '#64748b', text: '#e2e8f0', style: 'stars', patternColor: '#fbbf24' },
             y2k_hot: { name: 'Y2K 辣妹', bg: '#fce7f3', primary: '#db2777', text: '#be185d', style: 'y2k', patternColor: '#f472b6' },
             terrazzo_mix: { name: '繽紛水磨石', bg: '#f8fafc', primary: '#64748b', text: '#334155', style: 'terrazzo', patternColor: 'mix' },
             pop_art: { name: '波普藝術', bg: '#fef08a', primary: '#a855f7', text: '#6b21a8', style: 'popart', patternColor: '#d8b4fe' },
@@ -594,7 +490,6 @@
             memphis: { name: '孟菲斯', bg: '#fff7ed', primary: '#f97316', text: '#c2410c', style: 'memphis', patternColor: 'mix' },
             cheese: { name: '起司乳酪', bg: '#ffedd5', primary: '#f59e0b', text: '#b45309', style: 'cheese', patternColor: '#fbbf24' },
             film_noise: { name: '舊電影', bg: '#1c1917', primary: '#d6d3d1', text: '#e7e5e4', style: 'film', patternColor: '#44403c' },
-            
             zigzag_mint: { name: '清新薄荷', bg: '#ecfdf5', primary: '#10b981', text: '#065f46', style: 'zigzag', patternColor: '#a7f3d0' },
             waves_blue: { name: '海浪藍', bg: '#e0f2fe', primary: '#0ea5e9', text: '#0c4a6e', style: 'waves', patternColor: '#7dd3fc' },
             cross_lavender: { name: '薰衣草紫', bg: '#f3e8ff', primary: '#a855f7', text: '#6b21a8', style: 'cross', patternColor: '#d8b4fe' },
@@ -614,40 +509,23 @@
         function initPreviewRows() {
             const rowCamera = document.getElementById('preview-camera');
             const rowEdit = document.getElementById('preview-edit');
-            rowCamera.innerHTML = '';
-            rowEdit.innerHTML = '';
-
+            rowCamera.innerHTML = ''; rowEdit.innerHTML = '';
             for(let i=0; i<maxShots; i++) {
-                // 1. 拍照頁
                 const divCam = document.createElement('div');
-                divCam.className = 'preview-item';
-                divCam.id = `cam-item-${i}`;
+                divCam.className = 'preview-item'; divCam.id = `cam-item-${i}`;
                 divCam.innerHTML = `<i class="fa-regular fa-image"></i>`;
                 rowCamera.appendChild(divCam);
-
-                // 2. 編輯頁 (有上傳、點擊交換功能)
                 const divEdit = document.createElement('div');
-                divEdit.className = 'preview-item';
-                divEdit.id = `edit-item-${i}`;
+                divEdit.className = 'preview-item'; divEdit.id = `edit-item-${i}`;
                 divEdit.onclick = (e) => handleImageClick(i, e);
-                
-                divEdit.innerHTML = `
-                    <i class="fa-regular fa-image"></i>
-                    <div class="preview-overlay">
-                        <button class="mini-btn btn-upload" onclick="event.stopPropagation(); triggerUpload(${i})">
-                            <i class="fa-solid fa-upload"></i> 上傳
-                        </button>
-                    </div>
-                `;
+                divEdit.innerHTML = `<i class="fa-regular fa-image"></i><div class="preview-overlay"><button class="mini-btn btn-upload" onclick="event.stopPropagation(); triggerUpload(${i})"><i class="fa-solid fa-upload"></i> 上傳</button></div>`;
                 rowEdit.appendChild(divEdit);
             }
         }
         initPreviewRows();
 
-        // 處理圖片點擊 (交換順序)
         function handleImageClick(index, event) {
             if (!shots[index] && swapSourceIndex === -1) return;
-
             if (swapSourceIndex === -1) {
                 swapSourceIndex = index;
                 document.getElementById(`edit-item-${index}`).classList.add('selected');
@@ -655,16 +533,10 @@
                 document.getElementById(`edit-item-${index}`).classList.remove('selected');
                 swapSourceIndex = -1;
             } else {
-                const temp = shots[index];
-                shots[index] = shots[swapSourceIndex];
-                shots[swapSourceIndex] = temp;
-
-                updateShotUI(index);
-                updateShotUI(swapSourceIndex);
-                
+                const temp = shots[index]; shots[index] = shots[swapSourceIndex]; shots[swapSourceIndex] = temp;
+                updateShotUI(index); updateShotUI(swapSourceIndex);
                 document.querySelectorAll('.preview-item').forEach(el => el.classList.remove('selected'));
-                swapSourceIndex = -1;
-                render();
+                swapSourceIndex = -1; render();
             }
         }
 
@@ -681,91 +553,51 @@
             }
         });
 
-        window.triggerUpload = (index) => {
-            uploadTargetIndex = index;
-            imgUploadInput.click();
-        };
-
-        function updateShot(index, dataUrl) {
-            shots[index] = dataUrl;
-            updateShotUI(index);
-        }
-
+        window.triggerUpload = (index) => { uploadTargetIndex = index; imgUploadInput.click(); };
+        function updateShot(index, dataUrl) { shots[index] = dataUrl; updateShotUI(index); }
         function updateShotUI(index) {
             const dataUrl = shots[index];
             const updateItem = (prefix) => {
                 const item = document.getElementById(`${prefix}-item-${index}`);
                 if(item) {
-                    if (dataUrl) {
-                        item.style.backgroundImage = `url(${dataUrl})`;
-                        item.classList.add('has-img');
-                        const icon = item.querySelector('.fa-image');
-                        if(icon) icon.style.display = 'none';
-                    } else {
-                        item.style.backgroundImage = '';
-                        item.classList.remove('has-img');
-                        const icon = item.querySelector('.fa-image');
-                        if(icon) icon.style.display = 'block';
-                    }
+                    if (dataUrl) { item.style.backgroundImage = `url(${dataUrl})`; item.classList.add('has-img'); const icon = item.querySelector('.fa-image'); if(icon) icon.style.display = 'none'; } 
+                    else { item.style.backgroundImage = ''; item.classList.remove('has-img'); const icon = item.querySelector('.fa-image'); if(icon) icon.style.display = 'block'; }
                 }
             };
-            updateItem('cam');
-            updateItem('edit');
+            updateItem('cam'); updateItem('edit');
         }
 
         async function initCamera() {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: "user" } 
-                });
-                video.srcObject = stream;
-                await new Promise(resolve => video.onloadedmetadata = resolve);
-                video.play();
-                
-                particleCanvas.width = video.videoWidth;
-                particleCanvas.height = video.videoHeight;
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: "user" } });
+                video.srcObject = stream; await new Promise(resolve => video.onloadedmetadata = resolve); video.play();
+                particleCanvas.width = video.videoWidth; particleCanvas.height = video.videoHeight;
                 animateParticles(); 
-
                 hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
                 hands.setOptions({ maxNumHands: 2, modelComplexity: 1, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
                 hands.onResults(onHandResults);
                 startDetectionLoop();
-
-            } catch (err) {
-                console.error(err);
-                statusDisplay.innerHTML = `<span style="color:red">無法開啟相機</span>`;
-            }
+            } catch (err) { console.error(err); statusDisplay.innerHTML = `<span style="color:red">無法開啟相機</span>`; }
         }
         initCamera();
 
         function createParticles() {
             const cx = particleCanvas.width / 2, cy = particleCanvas.height / 2;
-            for(let i=0; i<30; i++) {
-                particles.push({
-                    x: cx, y: cy, vx: (Math.random()-0.5)*20, vy: (Math.random()-0.5)*20,
-                    life: 1.0, color: particleColors[Math.floor(Math.random()*particleColors.length)]
-                });
-            }
+            for(let i=0; i<30; i++) particles.push({ x: cx, y: cy, vx: (Math.random()-0.5)*20, vy: (Math.random()-0.5)*20, life: 1.0, color: particleColors[Math.floor(Math.random()*particleColors.length)] });
         }
         function animateParticles() {
             pCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
             for(let i = particles.length - 1; i >= 0; i--) {
-                const p = particles[i];
-                p.x += p.vx; p.y += p.vy; p.life -= 0.02; p.vy += 0.5;
+                const p = particles[i]; p.x += p.vx; p.y += p.vy; p.life -= 0.02; p.vy += 0.5;
                 if(p.life <= 0) particles.splice(i, 1);
-                else {
-                    pCtx.beginPath(); pCtx.arc(p.x, p.y, 4*p.life, 0, Math.PI*2);
-                    pCtx.globalAlpha = p.life; pCtx.fillStyle = p.color; pCtx.fill(); pCtx.globalAlpha = 1;
-                }
+                else { pCtx.beginPath(); pCtx.arc(p.x, p.y, 4*p.life, 0, Math.PI*2); pCtx.globalAlpha = p.life; pCtx.fillStyle = p.color; pCtx.fill(); pCtx.globalAlpha = 1; }
             }
             requestAnimationFrame(animateParticles);
         }
 
         function startDetectionLoop() {
             async function loop() {
-                if (mode === 'gesture' && !isBusy && video.readyState >= 2 && !isEditing) {
-                    await hands.send({image: video});
-                }
+                if (mode === 'gesture' && !isBusy && video.readyState >= 2 && !isEditing) await hands.send({image: video});
                 detectionLoopId = requestAnimationFrame(loop);
             }
             loop();
@@ -774,13 +606,11 @@
         function onHandResults(results) {
             if(!isModelLoaded) { isModelLoaded = true; if(mode === 'gesture') updateGestureHintUI(true); }
             if(isBusy || isEditing) return;
-
             if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
                 const lm = results.multiHandLandmarks[0];
                 if (lm[8].y < lm[6].y && lm[12].y < lm[10].y && lm[16].y < lm[14].y && lm[20].y < lm[18].y) {
                     const nextIndex = shots.findIndex(s => s === null);
-                    if (nextIndex !== -1) triggerGestureSnap(nextIndex);
-                    else if (!isEditing) finish(); 
+                    if (nextIndex !== -1) triggerGestureSnap(nextIndex); else if (!isEditing) finish(); 
                 }
             }
         }
@@ -791,139 +621,79 @@
         }
 
         function triggerGestureSnap(index) {
-            isBusy = true; createParticles();
-            statusDisplay.innerHTML = '<i class="fa-solid fa-hand-sparkles"></i> 偵測到手勢！';
+            isBusy = true; createParticles(); statusDisplay.innerHTML = '<i class="fa-solid fa-hand-sparkles"></i> 偵測到手勢！';
             gestureHint.style.background = "var(--primary)"; gestureHint.innerHTML = 'OK!';
-            setTimeout(() => {
-                updateGestureHintUI(true);
-                takeShotWithCountdown(index);
-            }, 600);
+            setTimeout(() => { updateGestureHintUI(true); takeShotWithCountdown(index); }, 600);
         }
 
         window.setMode = (m) => {
-            if(isBusy) return;
-            mode = m;
+            if(isBusy) return; mode = m;
             document.querySelectorAll('.mode-tab').forEach(b => b.classList.remove('active'));
             document.getElementById(`tab-${m}`).classList.add('active');
-            gestureHint.style.display = 'none';
-            btnSnap.disabled = false; btnSnap.style.display = 'flex';
-            
-            if(m === 'auto') {
-                btnSnap.innerHTML = '<i class="fa-solid fa-play"></i> 開始自動連拍';
-                statusDisplay.innerHTML = '自動倒數 3 秒連拍';
-            } else if (m === 'gesture') {
-                btnSnap.innerHTML = '<i class="fa-solid fa-hand"></i> 體感模式待機中';
-                statusDisplay.innerHTML = '請比「布 ✋」';
-                gestureHint.style.display = 'flex';
-                updateGestureHintUI(isModelLoaded);
-                btnSnap.disabled = true; 
-            } else {
-                btnSnap.innerHTML = '<i class="fa-solid fa-camera"></i> 立即拍照';
-                statusDisplay.innerHTML = '手動控制快門';
-            }
+            gestureHint.style.display = 'none'; btnSnap.disabled = false; btnSnap.style.display = 'flex';
+            if(m === 'auto') { btnSnap.innerHTML = '<i class="fa-solid fa-play"></i> 開始自動連拍'; statusDisplay.innerHTML = '自動倒數 3 秒連拍'; }
+            else if (m === 'gesture') { btnSnap.innerHTML = '<i class="fa-solid fa-hand"></i> 體感模式待機中'; statusDisplay.innerHTML = '請比「布 ✋」'; gestureHint.style.display = 'flex'; updateGestureHintUI(isModelLoaded); btnSnap.disabled = true; }
+            else { btnSnap.innerHTML = '<i class="fa-solid fa-camera"></i> 立即拍照'; statusDisplay.innerHTML = '手動控制快門'; }
         };
 
         btnSnap.onclick = () => {
             if(isBusy) return;
             const nextIndex = shots.findIndex(s => s === null);
             if(nextIndex === -1) { finish(); return; }
-
-            if(mode === 'auto') {
-                btnSnap.style.display = 'none';
-                runAutoSequence(nextIndex);
-            } else if (mode === 'manual') {
-                takeManualShot(nextIndex);
-            }
+            if(mode === 'auto') { btnSnap.style.display = 'none'; runAutoSequence(nextIndex); } 
+            else if (mode === 'manual') { takeManualShot(nextIndex); }
         };
 
         function runAutoSequence(startIndex) {
             if(startIndex >= maxShots) { finish(); return; }
-            statusDisplay.innerText = `準備拍攝第 ${startIndex + 1} 張...`;
-            isBusy = true;
+            statusDisplay.innerText = `準備拍攝第 ${startIndex + 1} 張...`; isBusy = true;
             setTimeout(() => {
                 runCountdown(3, () => {
-                    snap(startIndex);
-                    isBusy = false;
-                    if(startIndex + 1 < maxShots) {
-                        statusDisplay.innerText = "稍等一下...";
-                        setTimeout(() => runAutoSequence(startIndex+1), 1500);
-                    } else {
-                        setTimeout(finish, 800);
-                    }
+                    snap(startIndex); isBusy = false;
+                    if(startIndex + 1 < maxShots) { statusDisplay.innerText = "稍等一下..."; setTimeout(() => runAutoSequence(startIndex+1), 1500); } 
+                    else { setTimeout(finish, 800); }
                 });
             }, 1000);
         }
 
         function takeManualShot(index) {
-            isBusy = true;
-            snap(index);
-            setTimeout(() => { isBusy = false; }, 500);
-            
-            if(shots.filter(s => s !== null).length === maxShots) {
-                btnSnap.innerHTML = '<i class="fa-solid fa-check"></i> 完成拍攝';
-                setTimeout(finish, 800);
-            } else {
-                const next = index + 2;
-                if(next <= 4) btnSnap.innerHTML = `<i class="fa-solid fa-camera"></i> 拍下一張 (${next-1}/4)`;
-            }
+            isBusy = true; snap(index); setTimeout(() => { isBusy = false; }, 500);
+            if(shots.filter(s => s !== null).length === maxShots) { btnSnap.innerHTML = '<i class="fa-solid fa-check"></i> 完成拍攝'; setTimeout(finish, 800); } 
+            else { const next = index + 2; if(next <= 4) btnSnap.innerHTML = `<i class="fa-solid fa-camera"></i> 拍下一張 (${next-1}/4)`; }
         }
 
         function takeShotWithCountdown(index) {
             runCountdown(3, () => {
                 snap(index);
                 setTimeout(() => { 
-                    if(shots.filter(s=>s!==null).length < maxShots) {
-                        statusDisplay.innerHTML = `已拍 ${index+1}/4，請比「布 ✋」`; 
-                        isBusy = false; 
-                    } else finish();
+                    if(shots.filter(s=>s!==null).length < maxShots) { statusDisplay.innerHTML = `已拍 ${index+1}/4，請比「布 ✋」`; isBusy = false; } else finish();
                 }, 2500);
             });
         }
 
         function runCountdown(sec, callback) {
-            countdownOverlay.style.display = 'flex';
-            countdownOverlay.innerText = sec;
+            countdownOverlay.style.display = 'flex'; countdownOverlay.innerText = sec;
             let timer = setInterval(() => {
-                sec--;
-                if(sec>0) countdownOverlay.innerText = sec;
-                else {
-                    clearInterval(timer);
-                    countdownOverlay.style.display = 'none';
-                    callback();
-                }
+                sec--; if(sec>0) countdownOverlay.innerText = sec;
+                else { clearInterval(timer); countdownOverlay.style.display = 'none'; callback(); }
             }, 1000);
         }
 
         function snap(index) {
-            const f = document.createElement('div');
-            f.style.cssText = 'position:fixed;inset:0;background:white;z-index:999;pointer-events:none;';
-            document.body.appendChild(f);
+            const f = document.createElement('div'); f.style.cssText = 'position:fixed;inset:0;background:white;z-index:999;pointer-events:none;'; document.body.appendChild(f);
             f.animate([{opacity:1}, {opacity:0}], {duration:200}).onfinish = () => f.remove();
-
-            const c = document.createElement('canvas');
-            const targetW = 800, targetH = 600; 
-            c.width = targetW; c.height = targetH;
-            const ctx = c.getContext('2d');
-            
-            ctx.translate(c.width, 0); ctx.scale(-1, 1);
-            
-            const vw = video.videoWidth, vh = video.videoHeight;
-            const targetRatio = targetW / targetH; const videoRatio = vw / vh;
+            const c = document.createElement('canvas'); const targetW = 800, targetH = 600; c.width = targetW; c.height = targetH;
+            const ctx = c.getContext('2d'); ctx.translate(c.width, 0); ctx.scale(-1, 1);
+            const vw = video.videoWidth, vh = video.videoHeight; const targetRatio = targetW / targetH; const videoRatio = vw / vh;
             let sx, sy, sw, sh;
-            if (videoRatio > targetRatio) {
-                sh = vh; sw = sh * targetRatio; sy = 0; sx = (vw - sw) / 2;
-            } else {
-                sw = vw; sh = sw / targetRatio; sx = 0; sy = (vh - sh) / 2;
-            }
+            if (videoRatio > targetRatio) { sh = vh; sw = sh * targetRatio; sy = 0; sx = (vw - sw) / 2; } 
+            else { sw = vw; sh = sw / targetRatio; sx = 0; sy = (vh - sh) / 2; }
             ctx.drawImage(video, sx, sy, sw, sh, 0, 0, targetW, targetH);
-            
-            const data = c.toDataURL('image/png');
-            updateShot(index, data);
+            updateShot(index, c.toDataURL('image/png'));
         }
 
         function finish() {
-            isBusy = true;
-            statusDisplay.innerHTML = `<i class="fa-solid fa-check"></i> 完成！生成中...`;
+            isBusy = true; statusDisplay.innerHTML = `<i class="fa-solid fa-check"></i> 完成！生成中...`;
             setTimeout(() => {
                 isEditing = true;
                 document.getElementById('camera-section').classList.add('hidden');
@@ -945,9 +715,15 @@
                 const t = themes[key];
                 const div = document.createElement('div');
                 div.className = 'theme-circle' + (key === currentTheme ? ' active' : '');
-                const canvas = document.createElement('canvas'); canvas.width=60; canvas.height=60;
-                drawPatternBackground(canvas.getContext('2d'), 60, 60, t);
-                div.style.backgroundImage = `url(${canvas.toDataURL()})`;
+                
+                if (t.style === 'image') {
+                    div.style.backgroundImage = `url(${t.src})`;
+                } else {
+                    const canvas = document.createElement('canvas'); canvas.width=60; canvas.height=60;
+                    drawPatternBackground(canvas.getContext('2d'), 60, 60, t);
+                    div.style.backgroundImage = `url(${canvas.toDataURL()})`;
+                }
+                
                 div.onclick = (e) => setTheme(key, e.target);
                 themeWrapper.appendChild(div);
             });
@@ -955,9 +731,7 @@
             render();
             window.addEventListener('resize', fitCanvas);
             document.getElementById('custom-text').addEventListener('input', render);
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Delete' || e.key === 'Backspace') deleteSelected();
-            });
+            document.addEventListener('keydown', (e) => { if (e.key === 'Delete' || e.key === 'Backspace') deleteSelected(); });
             setTool('select');
         }
 
@@ -982,8 +756,7 @@
             ctx.beginPath(); ctx.moveTo(x + r, y);
             ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
             ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r);
-            ctx.closePath();
-            return ctx;
+            ctx.closePath(); return ctx;
         }
 
         function drawPatternBackground(ctx, w, h, theme) {
@@ -991,135 +764,29 @@
             const type = theme.style, pColor = theme.patternColor;
             ctx.fillStyle = pColor; ctx.strokeStyle = pColor;
             const scale = w < 100 ? 0.3 : 1;
-
-            if (type === 'rainbow') {
-                const g = ctx.createLinearGradient(0, 0, w, h);
-                g.addColorStop(0,"#fecaca"); g.addColorStop(0.5,"#a7f3d0"); g.addColorStop(1,"#c4b5fd");
-                ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
-            } else if (type === 'dots') {
-                const s = 40*scale; 
-                for(let x=0;x<w;x+=s) for(let y=0;y<h;y+=s) { ctx.beginPath(); ctx.arc(x+((y/s)%2?s/2:0), y, 5*scale, 0, Math.PI*2); ctx.fill(); }
-            } else if (type === 'cross') {
-                const s=10*scale, gap=50*scale; ctx.lineWidth=3*scale;
-                for(let x=20*scale;x<w;x+=gap) for(let y=20*scale;y<h;y+=gap) {
-                    let cx=x+((y/gap)%2?0:gap/2); ctx.beginPath(); ctx.moveTo(cx-s/2,y); ctx.lineTo(cx+s/2,y); ctx.moveTo(cx,y-s/2); ctx.lineTo(cx,y+s/2); ctx.stroke();
-                }
-            } else if (type === 'zigzag') {
-                const th=20*scale, tw=40*scale; ctx.lineWidth=4*scale;
-                for(let y=0;y<h;y+=th*2) { ctx.beginPath(); for(let x=0;x<w;x+=tw){ctx.moveTo(x,y);ctx.lineTo(x+tw/2,y+th);ctx.lineTo(x+tw,y);} ctx.stroke(); }
-            } else if (type === 'waves') {
-                const wh=20*scale, ww=60*scale; ctx.lineWidth=3*scale;
-                for(let y=20*scale;y<h;y+=40*scale) { ctx.beginPath(); ctx.moveTo(0,y); for(let x=0;x<w;x+=ww){ctx.quadraticCurveTo(x+ww/4,y-wh,x+ww/2,y);ctx.quadraticCurveTo(x+ww*0.75,y+wh,x+ww,y);} ctx.stroke(); }
-            } else if (type === 'clouds') {
-                for(let i=0;i<(scale<1?5:20);i++) { let cx=Math.random()*w, cy=Math.random()*h; ctx.beginPath(); ctx.arc(cx, cy, 20*scale, 0, Math.PI*2); ctx.arc(cx+15*scale, cy-10*scale, 25*scale, 0, Math.PI*2); ctx.fill(); }
-            } else if (type === 'triangles') {
-                const s=30*scale; 
-                for(let x=0;x<w;x+=s*1.5) for(let y=0;y<h;y+=s*1.5) {
-                    let off=(y/(s*1.5))%2===0?0:s*0.75; ctx.beginPath(); ctx.moveTo(x+off,y-s/2); ctx.lineTo(x+off-s/2,y+s/2); ctx.lineTo(x+off+s/2,y+s/2); ctx.fill();
-                }
-            } else if (type === 'confetti') {
-                const c=['#f43f5e','#3b82f6','#10b981','#f59e0b','#8b5cf6'];
-                for(let i=0;i<(scale<1?30:150);i++){ ctx.fillStyle=c[Math.floor(Math.random()*c.length)]; ctx.beginPath(); if(Math.random()>0.5) ctx.arc(Math.random()*w,Math.random()*h,Math.random()*8*scale,0,Math.PI*2); else ctx.fillRect(Math.random()*w,Math.random()*h,8*scale,8*scale); ctx.fill(); }
-            } else if (type === 'grid') {
-                const s=40*scale; ctx.lineWidth=2*scale; ctx.beginPath(); for(let i=0;i<=w;i+=s){ctx.moveTo(i,0);ctx.lineTo(i,h);} for(let i=0;i<=h;i+=s){ctx.moveTo(0,i);ctx.lineTo(w,i);} ctx.stroke();
-            } else if (type === 'cow') {
-                for(let i=0;i<(scale<1?10:50);i++){ ctx.beginPath(); let r=(20+Math.random()*40)*scale, cx=Math.random()*w, cy=Math.random()*h; ctx.moveTo(cx+r,cy); for(let a=0;a<7;a++) ctx.lineTo(cx+Math.cos(a)*r*(0.8+Math.random()*0.4), cy+Math.sin(a)*r*(0.8+Math.random()*0.4)); ctx.fill(); }
-            } else if (type === 'check') {
-                const s=60*scale; for(let x=0;x<w;x+=s) for(let y=0;y<h;y+=s) if((x/s+y/s)%2===0) ctx.fillRect(x,y,s,s);
-            } else if (type === 'y2k') {
-                // Y2K: Grid + Starburst
-                const s=50*scale; ctx.lineWidth=1*scale; ctx.strokeStyle = 'rgba(255,255,255,0.4)';
-                for(let i=0;i<=w;i+=s){ctx.moveTo(i,0);ctx.lineTo(i,h);} for(let i=0;i<=h;i+=s){ctx.moveTo(0,i);ctx.lineTo(w,i);} ctx.stroke();
-                // Random Stars
-                ctx.fillStyle = '#ffffff';
-                for(let i=0;i<(scale<1?5:20);i++) {
-                    let cx=Math.random()*w, cy=Math.random()*h, r=(5+Math.random()*10)*scale;
-                    ctx.beginPath();
-                    for(let j=0; j<8; j++) {
-                        let angle = Math.PI/4 * j;
-                        let len = (j%2===0) ? r*2 : r*0.5;
-                        ctx.lineTo(cx + Math.cos(angle)*len, cy + Math.sin(angle)*len);
-                    }
-                    ctx.fill();
-                }
-            } else if (type === 'terrazzo') {
-                const colors = ['#f87171', '#fbbf24', '#34d399', '#60a5fa'];
-                for(let i=0;i<(scale<1?20:100);i++) {
-                    ctx.fillStyle = colors[Math.floor(Math.random()*colors.length)];
-                    ctx.beginPath();
-                    let cx=Math.random()*w, cy=Math.random()*h;
-                    ctx.moveTo(cx, cy);
-                    for(let j=0; j<3+Math.random()*3; j++) {
-                        ctx.lineTo(cx+(Math.random()-0.5)*30*scale, cy+(Math.random()-0.5)*30*scale);
-                    }
-                    ctx.fill();
-                }
-            } else if (type === 'popart') {
-                const s = 30*scale;
-                ctx.fillStyle = pColor;
-                for(let x=0;x<w;x+=s) for(let y=0;y<h;y+=s) {
-                    if((Math.floor(x/s)+Math.floor(y/s))%2===0) {
-                        ctx.beginPath(); ctx.arc(x+s/2, y+s/2, s*0.4, 0, Math.PI*2); ctx.fill();
-                    }
-                }
-            } else if (type === 'aurora') {
-                const g = ctx.createLinearGradient(0, 0, w, h);
-                g.addColorStop(0, "#818cf8"); g.addColorStop(0.5, "#c084fc"); g.addColorStop(1, "#f472b6");
-                ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
-            } else if (type === 'notebook') {
-                const s=30*scale; ctx.strokeStyle=pColor; ctx.lineWidth=1;
-                ctx.beginPath();
-                for(let x=0;x<w;x+=s){ctx.moveTo(x,0);ctx.lineTo(x,h);}
-                for(let y=0;y<h;y+=s){ctx.moveTo(0,y);ctx.lineTo(w,y);}
-                ctx.stroke();
-            } else if (type === 'memphis') {
-                // Simple shapes
-                const colors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b'];
-                for(let i=0;i<(scale<1?10:40);i++) {
-                    ctx.strokeStyle = colors[Math.floor(Math.random()*colors.length)];
-                    ctx.lineWidth = 3*scale;
-                    let type = Math.floor(Math.random()*3);
-                    let cx=Math.random()*w, cy=Math.random()*h;
-                    ctx.beginPath();
-                    if(type===0) { ctx.arc(cx,cy, 8*scale, 0, Math.PI*2); ctx.stroke(); } // Circle
-                    else if(type===1) { ctx.moveTo(cx,cy); ctx.lineTo(cx+10*scale,cy+10*scale); ctx.lineTo(cx+20*scale,cy); ctx.stroke(); } // Zigzag
-                    else { ctx.rect(cx,cy, 10*scale, 10*scale); ctx.fillStyle=ctx.strokeStyle; ctx.fill(); } // Square
-                }
-            } else if (type === 'cheese') {
-                ctx.fillStyle = pColor;
-                for(let i=0;i<(scale<1?10:50);i++) {
-                    ctx.beginPath();
-                    ctx.arc(Math.random()*w, Math.random()*h, (5+Math.random()*15)*scale, 0, Math.PI*2);
-                    ctx.fill();
-                }
-            } else if (type === 'film') {
-                // Noise
-                const id = ctx.getImageData(0,0,w,h);
-                const d = id.data;
-                for(let i=0; i<d.length; i+=4) {
-                    const noise = (Math.random()-0.5)*30;
-                    d[i] = Math.min(255, Math.max(0, d[i]+noise));
-                    d[i+1] = Math.min(255, Math.max(0, d[i+1]+noise));
-                    d[i+2] = Math.min(255, Math.max(0, d[i+2]+noise));
-                }
-                ctx.putImageData(id,0,0);
-            } 
-            // === 星星繪製 (RESTORED) ===
-            else if (type === 'stars') {
-                const drawStar = (cx, cy, spikes, outerRadius, innerRadius) => {
-                    let rot = Math.PI / 2 * 3; let x = cx, y = cy; let step = Math.PI / spikes;
-                    ctx.beginPath(); ctx.moveTo(cx, cy - outerRadius);
-                    for (let i = 0; i < spikes; i++) {
-                        x = cx + Math.cos(rot) * outerRadius; y = cy + Math.sin(rot) * outerRadius; ctx.lineTo(x, y); rot += step;
-                        x = cx + Math.cos(rot) * innerRadius; y = cy + Math.sin(rot) * innerRadius; ctx.lineTo(x, y); rot += step;
-                    }
-                    ctx.lineTo(cx, cy - outerRadius); ctx.closePath(); ctx.fill();
-                }
-                for(let i=0; i<(scale<1?15:80); i++) {
-                    const x = Math.random() * w; const y = Math.random() * h; const size = (Math.random() * 6 + 4) * scale;
-                    drawStar(x, y, 5, size, size/2);
-                }
+            // (Pattern logic)
+            if (type === 'dots') { const s = 40*scale; for(let x=0;x<w;x+=s) for(let y=0;y<h;y+=s) { ctx.beginPath(); ctx.arc(x+((y/s)%2?s/2:0), y, 5*scale, 0, Math.PI*2); ctx.fill(); } }
+            else if (type === 'stars') { for(let i=0; i<(scale<1?15:80); i++) { ctx.beginPath(); ctx.arc(Math.random()*w, Math.random()*h, Math.random()*3*scale, 0, Math.PI*2); ctx.fill(); } }
+            else if (type === 'clouds') { for(let i=0;i<(scale<1?5:20);i++) { let cx=Math.random()*w, cy=Math.random()*h; ctx.beginPath(); ctx.arc(cx, cy, 20*scale, 0, Math.PI*2); ctx.arc(cx+15*scale, cy-10*scale, 25*scale, 0, Math.PI*2); ctx.fill(); } }
+            else if (type === 'y2k') { 
+                const s=50*scale; ctx.lineWidth=1*scale; ctx.strokeStyle = 'rgba(255,255,255,0.4)'; for(let i=0;i<=w;i+=s){ctx.moveTo(i,0);ctx.lineTo(i,h);} for(let i=0;i<=h;i+=s){ctx.moveTo(0,i);ctx.lineTo(w,i);} ctx.stroke();
+                ctx.fillStyle = '#ffffff'; for(let i=0;i<(scale<1?5:20);i++) { let cx=Math.random()*w, cy=Math.random()*h, r=(5+Math.random()*10)*scale; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill(); }
             }
+            else if (type === 'terrazzo') { const colors = ['#f87171', '#fbbf24', '#34d399', '#60a5fa']; for(let i=0;i<(scale<1?20:100);i++) { ctx.fillStyle = colors[Math.floor(Math.random()*colors.length)]; ctx.beginPath(); ctx.moveTo(Math.random()*w, Math.random()*h); for(let j=0; j<3; j++) ctx.lineTo(Math.random()*w, Math.random()*h); ctx.fill(); } }
+            else if (type === 'rainbow') { const g = ctx.createLinearGradient(0, 0, w, h); g.addColorStop(0,"#fecaca"); g.addColorStop(0.5,"#a7f3d0"); g.addColorStop(1,"#c4b5fd"); ctx.fillStyle = g; ctx.fillRect(0,0,w,h); }
+            else if (type === 'cross') { const s=10*scale, gap=50*scale; ctx.lineWidth=3*scale; for(let x=20*scale;x<w;x+=gap) for(let y=20*scale;y<h;y+=gap) { let cx=x+((y/gap)%2?0:gap/2); ctx.beginPath(); ctx.moveTo(cx-s/2,y); ctx.lineTo(cx+s/2,y); ctx.moveTo(cx,y-s/2); ctx.lineTo(cx,y+s/2); ctx.stroke(); } }
+            else if (type === 'zigzag') { const th=20*scale, tw=40*scale; ctx.lineWidth=4*scale; for(let y=0;y<h;y+=th*2) { ctx.beginPath(); for(let x=0;x<w;x+=tw){ctx.moveTo(x,y);ctx.lineTo(x+tw/2,y+th);ctx.lineTo(x+tw,y);} ctx.stroke(); } }
+            else if (type === 'waves') { const wh=20*scale, ww=60*scale; ctx.lineWidth=3*scale; for(let y=20*scale;y<h;y+=40*scale) { ctx.beginPath(); ctx.moveTo(0,y); for(let x=0;x<w;x+=ww){ctx.quadraticCurveTo(x+ww/4,y-wh,x+ww/2,y);ctx.quadraticCurveTo(x+ww*0.75,y+wh,x+ww,y);} ctx.stroke(); } }
+            else if (type === 'confetti') { const c=['#f43f5e','#3b82f6','#10b981','#f59e0b','#8b5cf6']; for(let i=0;i<(scale<1?30:150);i++){ ctx.fillStyle=c[Math.floor(Math.random()*c.length)]; ctx.beginPath(); if(Math.random()>0.5) ctx.arc(Math.random()*w,Math.random()*h,Math.random()*8*scale,0,Math.PI*2); else ctx.fillRect(Math.random()*w,Math.random()*h,8*scale,8*scale); ctx.fill(); } }
+            else if (type === 'grid') { const s=40*scale; ctx.lineWidth=2*scale; ctx.beginPath(); for(let i=0;i<=w;i+=s){ctx.moveTo(i,0);ctx.lineTo(i,h);} for(let i=0;i<=h;i+=s){ctx.moveTo(0,i);ctx.lineTo(w,i);} ctx.stroke(); }
+            else if (type === 'cow') { for(let i=0;i<(scale<1?10:50);i++){ ctx.beginPath(); let r=(20+Math.random()*40)*scale, cx=Math.random()*w, cy=Math.random()*h; ctx.moveTo(cx+r,cy); for(let a=0;a<7;a++) ctx.lineTo(cx+Math.cos(a)*r*(0.8+Math.random()*0.4), cy+Math.sin(a)*r*(0.8+Math.random()*0.4)); ctx.fill(); } }
+            else if (type === 'check') { const s=60*scale; for(let x=0;x<w;x+=s) for(let y=0;y<h;y+=s) if((x/s+y/s)%2===0) ctx.fillRect(x,y,s,s); }
+            else if (type === 'popart') { const s = 30*scale; ctx.fillStyle = pColor; for(let x=0;x<w;x+=s) for(let y=0;y<h;y+=s) { if((Math.floor(x/s)+Math.floor(y/s))%2===0) { ctx.beginPath(); ctx.arc(x+s/2, y+s/2, s*0.4, 0, Math.PI*2); ctx.fill(); } } }
+            else if (type === 'aurora') { const g = ctx.createLinearGradient(0, 0, w, h); g.addColorStop(0, "#818cf8"); g.addColorStop(0.5, "#c084fc"); g.addColorStop(1, "#f472b6"); ctx.fillStyle = g; ctx.fillRect(0,0,w,h); }
+            else if (type === 'notebook') { const s=30*scale; ctx.strokeStyle=pColor; ctx.lineWidth=1; ctx.beginPath(); for(let x=0;x<w;x+=s){ctx.moveTo(x,0);ctx.lineTo(x,h);} for(let y=0;y<h;y+=s){ctx.moveTo(0,y);ctx.lineTo(w,y);} ctx.stroke(); }
+            else if (type === 'memphis') { const colors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b']; for(let i=0;i<(scale<1?10:40);i++) { ctx.strokeStyle = colors[Math.floor(Math.random()*colors.length)]; ctx.lineWidth = 3*scale; let type = Math.floor(Math.random()*3); let cx=Math.random()*w, cy=Math.random()*h; ctx.beginPath(); if(type===0) { ctx.arc(cx,cy, 8*scale, 0, Math.PI*2); ctx.stroke(); } else if(type===1) { ctx.moveTo(cx,cy); ctx.lineTo(cx+10*scale,cy+10*scale); ctx.lineTo(cx+20*scale,cy); ctx.stroke(); } else { ctx.rect(cx,cy, 10*scale, 10*scale); ctx.fillStyle=ctx.strokeStyle; ctx.fill(); } } }
+            else if (type === 'cheese') { ctx.fillStyle = pColor; for(let i=0;i<(scale<1?10:50);i++) { ctx.beginPath(); ctx.arc(Math.random()*w, Math.random()*h, (5+Math.random()*15)*scale, 0, Math.PI*2); ctx.fill(); } }
+            else if (type === 'film') { const id = ctx.getImageData(0,0,w,h); const d = id.data; for(let i=0; i<d.length; i+=4) { const noise = (Math.random()-0.5)*30; d[i] = Math.min(255, Math.max(0, d[i]+noise)); d[i+1] = Math.min(255, Math.max(0, d[i+1]+noise)); d[i+2] = Math.min(255, Math.max(0, d[i+2]+noise)); } ctx.putImageData(id,0,0); } 
         }
 
         function render() {
@@ -1131,66 +798,87 @@
 
             const bgC = document.createElement('canvas'); bgC.width = tW; bgC.height = tH;
             const ctx = bgC.getContext('2d');
-            drawPatternBackground(ctx, tW, tH, t);
             
-            const showBorder = document.getElementById('toggle-border').checked;
-            const borderWidth = parseInt(document.getElementById('border-width').value);
-            const borderColor = document.getElementById('border-color').value;
-            const radius = parseInt(document.getElementById('border-radius').value);
-
-            const textStrokeEnabled = document.getElementById('text-stroke-toggle').checked;
-            const textStrokeColor = document.getElementById('text-stroke-color').value;
-            const textStrokeWidth = parseInt(document.getElementById('text-stroke-width').value);
-
-            let loadedCount = 0;
-            const validShots = shots.map(s => s || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7");
-
-            validShots.forEach((src, i) => {
-                const img = new Image();
-                img.onload = () => {
-                    const col = i % 2, row = Math.floor(i / 2);
-                    const x = pad + col * (pW + pad), y = pad + row * (pH + pad);
-
-                    ctx.save();
-                    roundRect(ctx, x, y, pW, pH, radius); ctx.clip();
-                    if(currentFilter !== 'none') ctx.filter = currentFilter;
-                    const iRatio = img.width/img.height, fRatio = pW/pH;
-                    let dw=pW, dh=pH, dx=0, dy=0;
-                    if(iRatio > fRatio) { dw=pH*iRatio; dx=(pW-dw)/2; } else { dh=pW/iRatio; dy=(pH-dh)/2; }
-                    ctx.drawImage(img, x+dx, y+dy, dw, dh);
-                    ctx.restore();
-
-                    if (showBorder && borderWidth > 0) {
-                        ctx.save(); ctx.lineWidth = borderWidth; ctx.strokeStyle = borderColor;
-                        roundRect(ctx, x, y, pW, pH, radius); ctx.stroke(); ctx.restore();
-                    }
-
-                    loadedCount++;
-                    if(loadedCount === 4) {
-                        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                        ctx.font = `bold 32px ${document.getElementById('font-family').value}`;
-                        const now = new Date();
-                        const dateStr = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`;
-                        const input = document.getElementById('custom-text').value.trim();
-                        const txt = `Chill Photo${input ? ' ｜ '+input : ''} ｜ ${dateStr}`;
-                        const tx = tW/2, ty = tH - 50;
-
-                        if (textStrokeEnabled) {
-                            ctx.save(); ctx.strokeStyle = textStrokeColor; ctx.lineWidth = textStrokeWidth;
-                            ctx.lineJoin = 'round'; ctx.miterLimit = 2; ctx.strokeText(txt, tx, ty); ctx.restore();
-                        }
-                        ctx.fillStyle = document.getElementById('text-color').value;
-                        ctx.fillText(txt, tx, ty);
-
-                        fabricCanvas.setDimensions({ width: tW, height: tH });
-                        fabric.Image.fromURL(bgC.toDataURL(), (o) => {
-                            fabricCanvas.setBackgroundImage(o, fabricCanvas.renderAll.bind(fabricCanvas));
-                            fitCanvas();
-                        });
-                    }
+            // 修正本機讀取：移除 crossOrigin 並確保載入
+            if (t.style === 'image') {
+                const bgImg = new Image();
+                bgImg.onload = () => {
+                    ctx.clearRect(0,0,tW,tH); 
+                    ctx.drawImage(bgImg, 0, 0, tW, tH); 
+                    processPhotos();
                 };
-                img.src = src;
-            });
+                bgImg.onerror = () => {
+                    alert(`找不到圖片: ${t.src}\n請確認檔名大小寫與路徑。`);
+                    drawPatternBackground(ctx, tW, tH, { ...t, style: 'solid', bg: '#e2e8f0' });
+                    processPhotos();
+                }
+                bgImg.src = t.src;
+            } else {
+                drawPatternBackground(ctx, tW, tH, t);
+                processPhotos();
+            }
+
+            function processPhotos() {
+                const showBorder = document.getElementById('toggle-border').checked;
+                const borderWidth = parseInt(document.getElementById('border-width').value);
+                const borderColor = document.getElementById('border-color').value;
+                const radius = parseInt(document.getElementById('border-radius').value);
+                const textStrokeEnabled = document.getElementById('text-stroke-toggle').checked;
+                const textStrokeColor = document.getElementById('text-stroke-color').value;
+                const textStrokeWidth = parseInt(document.getElementById('text-stroke-width').value);
+
+                let loadedCount = 0;
+                const validShots = shots.map(s => s || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7");
+
+                validShots.forEach((src, i) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const col = i % 2, row = Math.floor(i / 2);
+                        const x = pad + col * (pW + pad), y = pad + row * (pH + pad);
+
+                        ctx.save();
+                        roundRect(ctx, x, y, pW, pH, radius); ctx.clip();
+                        if(currentFilter !== 'none') ctx.filter = currentFilter;
+                        
+                        const iRatio = img.width/img.height, fRatio = pW/pH;
+                        let dw=pW, dh=pH, dx=0, dy=0;
+                        if(iRatio > fRatio) { dw=pH*iRatio; dx=(pW-dw)/2; } else { dh=pW/iRatio; dy=(pH-dh)/2; }
+                        ctx.drawImage(img, x+dx, y+dy, dw, dh);
+                        ctx.restore();
+
+                        if (showBorder && borderWidth > 0) {
+                            ctx.save(); ctx.lineWidth = borderWidth; ctx.strokeStyle = borderColor;
+                            roundRect(ctx, x, y, pW, pH, radius); ctx.stroke(); ctx.restore();
+                        }
+
+                        loadedCount++;
+                        if(loadedCount === 4) {
+                            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                            ctx.font = `bold 32px ${document.getElementById('font-family').value}`;
+                            const now = new Date();
+                            const dateStr = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`;
+                            const input = document.getElementById('custom-text').value.trim();
+                            const txt = `Chill Photo${input ? ' ｜ '+input : ''} ｜ ${dateStr}`;
+                            const tx = tW/2, ty = tH - 50;
+
+                            if (textStrokeEnabled) {
+                                ctx.save(); ctx.strokeStyle = textStrokeColor; ctx.lineWidth = textStrokeWidth;
+                                ctx.lineJoin = 'round'; ctx.miterLimit = 2; ctx.strokeText(txt, tx, ty); ctx.restore();
+                            }
+                            ctx.fillStyle = document.getElementById('text-color').value;
+                            ctx.fillText(txt, tx, ty);
+
+                            fabricCanvas.setDimensions({ width: tW, height: tH });
+                            
+                            // 關鍵修正：直接使用 Canvas 元素作為 Fabric 背景，繞過 toDataURL 安全限制
+                            const bgInstance = new fabric.Image(bgC);
+                            fabricCanvas.setBackgroundImage(bgInstance, fabricCanvas.renderAll.bind(fabricCanvas));
+                            fitCanvas();
+                        }
+                    };
+                    img.src = src;
+                });
+            }
         }
 
         function fitCanvas() {
@@ -1210,11 +898,8 @@
             if(name === 'draw') { 
                 btnS.classList.remove('active'); btnD.classList.add('active'); 
                 const b = new fabric.PencilBrush(fabricCanvas);
-                b.color = document.getElementById('pen-color').value; b.width = 12;
-                fabricCanvas.freeDrawingBrush = b;
-            } else {
-                btnS.classList.add('active'); btnD.classList.remove('active');
-            }
+                b.color = document.getElementById('pen-color').value; b.width = 12; fabricCanvas.freeDrawingBrush = b;
+            } else { btnS.classList.add('active'); btnD.classList.remove('active'); }
         };
 
         window.addImageSticker = (url) => {
@@ -1237,13 +922,35 @@
         
         window.downloadImage = () => {
             fabricCanvas.discardActiveObject(); fabricCanvas.renderAll();
-            const link = document.createElement('a');
-            link.download = `ChillPhoto_${Date.now()}.png`;
-            link.href = fabricCanvas.toDataURL({ format: 'png', multiplier: 1 });
-            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            try {
+                const link = document.createElement('a');
+                link.download = `ChillPhoto_${Date.now()}.png`;
+                link.href = fabricCanvas.toDataURL({ format: 'png', multiplier: 1 });
+                document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            } catch(e) {
+                alert("因瀏覽器安全性限制 (Tainted Canvas)，本機圖片無法直接下載。\n\n建議您使用螢幕截圖，或將此網頁放上網頁伺服器 (Web Server) 執行。");
+            }
         };
         
         setMode('auto');
+
+        const mascot = document.querySelector('.mascot-container');
+        let isDraggingMascot = false; let dragStartX, dragStartY;
+        function startDrag(e) {
+            isDraggingMascot = true; mascot.style.cursor = 'grabbing';
+            const clientX = e.clientX || e.touches[0].clientX; const clientY = e.clientY || e.touches[0].clientY;
+            const rect = mascot.getBoundingClientRect(); dragStartX = clientX - rect.left; dragStartY = clientY - rect.top; e.preventDefault();
+        }
+        function onDrag(e) {
+            if (!isDraggingMascot) return; e.preventDefault();
+            const clientX = e.clientX || e.touches[0].clientX; const clientY = e.clientY || e.touches[0].clientY;
+            const x = clientX - dragStartX; const y = clientY - dragStartY;
+            mascot.style.bottom = 'auto'; mascot.style.right = 'auto'; mascot.style.left = `${x}px`; mascot.style.top = `${y}px`;
+        }
+        function stopDrag() { isDraggingMascot = false; mascot.style.cursor = 'grab'; }
+        mascot.addEventListener('mousedown', startDrag); mascot.addEventListener('touchstart', startDrag, {passive: false});
+        window.addEventListener('mousemove', onDrag); window.addEventListener('touchmove', onDrag, {passive: false});
+        window.addEventListener('mouseup', stopDrag); window.addEventListener('touchend', stopDrag);
     </script>
 </body>
 </html>
